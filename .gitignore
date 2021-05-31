@@ -1,0 +1,22 @@
+# npm
+node_modules/
+
+# yarn: https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+.pnp.*
+
+# log files
+*.log
+
+# config, dotenv (secrets)
+.env
+
+# database
+database_datas

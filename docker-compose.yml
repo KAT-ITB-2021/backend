@@ -1,0 +1,13 @@
+services:
+  database:
+    container_name: database
+    image: mariadb:10.6-focal
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+    volumes:
+      - ./database_datas:/var/lib/mysql
+    environment:
+      - MARIADB_RANDOM_ROOT_PASSWORD=1
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASS}
+      - MARIADB_DATABASE=${DB_NAME}
