@@ -1,5 +1,6 @@
 const app = require('./app');
 const config = require('./config');
 
-app.listen(config.express.port, config.express.ip);
-console.log(`Server started at http://${config.express.ip}:${config.express.port}`);
+const app = express();
+app.use('/api', require('./routes/login'));
+app.use('/api', require('./routes/register'));
