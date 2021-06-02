@@ -7,6 +7,7 @@
     "pretest": "NODE_ENV=test yarn sequelize db:migrate",
     "test": "yarn pretest && NODE_ENV=test yarn jest && yarn posttest",
     "posttest": "NODE_ENV=test yarn sequelize db:migrate:undo:all",
+    "lint": "yarn eslint app/",
     "start": "node app/index.js"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
+    "eslint": "^7.27.0",
     "jest": "^27.0.3",
     "supertest": "^6.1.3"
   }
