@@ -12,9 +12,12 @@ module.exports = {
         type: Sequelize.STRING
       },
       hashedPassword: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING.BINARY
       },
       salt: {
+        type: Sequelize.STRING.BINARY
+      },
+      role: {
         type: Sequelize.STRING
       },
       createdAt: {
