@@ -12,6 +12,10 @@
     "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
-    "sequelize": "^6.6.2"
+    "sequelize": "^6.6.2",
+    "sequelize-cli": "^6.2.0"
+  },
+  "devDependencies": {
+    "jest": "^27.0.3"
   }
 }
