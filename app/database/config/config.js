@@ -8,10 +8,11 @@ module.exports = {
     "dialect": "mariadb"
   },
   "test": {
-    "username": process.env.DB_USER,
-    "password": process.env.DB_PASS,
-    "database": process.env.DB_NAME,
-    "host": process.env.DB_HOST,
+    "username": "root",
+    "password": "",
+    "database": "test",
+    "host": "localhost",
+    "port": 3307,
     "dialect": "mariadb"
   },
   "production": {

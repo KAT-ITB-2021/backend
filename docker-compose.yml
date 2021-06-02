@@ -11,3 +11,11 @@ services:
       - MARIADB_USER=${DB_USER}
       - MARIADB_PASSWORD=${DB_PASS}
       - MARIADB_DATABASE=${DB_NAME}
+  database_test:
+    container_name: database_test
+    image: mariadb:10.6-focal
+    ports:
+      - 3307:3306
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1
+      - MARIADB_DATABASE=test
