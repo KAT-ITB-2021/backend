@@ -19,4 +19,4 @@ jobs:
       database:
         image: mariadb:10.6-focal
         ports:
-        - 3306:3307
+        - 3307:3306
