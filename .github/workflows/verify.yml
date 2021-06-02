@@ -15,8 +15,13 @@ jobs:
       - uses: actions/setup-node@v2
       - run: yarn install
       - run: yarn test
+        env:
+          - DB_PORT: ${{ job.services.database.ports['3306'] }}
     services:
       database:
         image: mariadb:10.6-focal
+        env:
+          - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1
+          - MARIADB_DATABASE=test
         ports:
-        - 3307:3306
+        - 3306:3306

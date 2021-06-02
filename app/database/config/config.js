@@ -5,6 +5,7 @@ module.exports = {
     "password": process.env.DB_PASS,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
+    "port": process.env.DB_PORT,
     "dialect": "mariadb"
   },
   "test": {
@@ -12,7 +13,7 @@ module.exports = {
     "password": "",
     "database": "test",
     "host": "localhost",
-    "port": 3307,
+    "port": process.env.DB_PORT,
     "dialect": "mariadb"
   },
   "production": {
@@ -20,6 +21,7 @@ module.exports = {
     "password": process.env.DB_PASS,
     "database": process.env.DB_NAME,
     "host": process.env.DB_HOST,
+    "port": process.env.DB_PORT,
     "dialect": "mariadb"
   }
 }
