@@ -6,7 +6,7 @@ describe('Test login', () => {
   afterAll(()=>model.sequelize.close());
   test('Login invalid user', ()=>{
     return request(app)
-      .post('/api/login')
+      .post('/login')
       .field('username', 'aaa')
       .field('password', 'aaa')
       .then((response) => {
@@ -15,7 +15,7 @@ describe('Test login', () => {
   });
   test('Login without username', () => {
     return request(app)
-      .post('/api/register')
+      .post('/login')
       .field('password', 'aaa')
       .then((response)=>{
         expect(response.statusCode).toBe(400);
@@ -23,7 +23,7 @@ describe('Test login', () => {
   });
   test('Login without password', () => {
     return request(app)
-      .post('/api/register')
+      .post('/login')
       .field('username', 'aaa')
       .then((response)=>{
         expect(response.statusCode).toBe(400);
