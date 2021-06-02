@@ -10,7 +10,7 @@ module.exports = {
   register(req, res, next) {
     /* Handle Register */
     const form = formidable({multiples: true});
-    form.parse(req, (err, fields, _) => {
+    form.parse(req, (err, fields) => {
       if(err){
         next(err);
       }
@@ -18,7 +18,7 @@ module.exports = {
         /* Berhasil parse form */
         if(!fields.username || !fields.password) return res.status(400).json({ message: ''});
         const salt = crypto.randomBytes(32);
-        crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', (err, derivedKey) => {
+        crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', (_, derivedKey) => {
           User.create({
             username: fields.username,
             hashedPassword: derivedKey.toString('hex'),
@@ -31,11 +31,11 @@ module.exports = {
                 'role': user.role
               }, process.env.JWT_SECRET)
             );
-          }).catch((err) => {
+          }).catch(() => {
             res.status(500).json({ message: 'Error when creating user'});
           });
         });
       }
     });
   }
-}
+};

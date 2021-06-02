@@ -6,7 +6,7 @@ require('dotenv').config();
 let express = {
   port: process.env.EXPRESS_PORT || 3000,
   ip: '0.0.0.0'
-}
+};
 
 /**
  * Konfigurasi prefix untuk API, nanti tidak dibutuhkan karena pakai reverse proxy (?)

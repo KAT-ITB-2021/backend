@@ -1,6 +1,6 @@
 const express = require('express');
 const router = new express.Router();
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const formidable = require('formidable');
 
 const ParseURLEncoded = express.urlencoded({extended: false});
@@ -8,7 +8,7 @@ const ParseURLEncoded = express.urlencoded({extended: false});
 router.post('/login', ParseURLEncoded, (req, res, next) => {
   /* Handle Login */
   const form = formidable({multiples: true});
-  form.parse(req, (err, fields, _) => {
+  form.parse(req, (err, fields) => {
     if(err){
       next(err);
     }
@@ -19,4 +19,4 @@ router.post('/login', ParseURLEncoded, (req, res, next) => {
   });
 });
 
-module.exports = router
+module.exports = router;
