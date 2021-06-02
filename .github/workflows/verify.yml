@@ -6,7 +6,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-      - run: npm install -g yarn
       - run: yarn install
       - run: yarn lint
   test:
@@ -14,7 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
-      - run: npm install -g yarn
       - run: yarn install
       - run: yarn test
     services:
