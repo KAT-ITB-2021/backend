@@ -17,6 +17,7 @@ jobs:
       - run: yarn test
         env:
           DB_PORT: ${{ job.services.database.ports['3306'] }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
     services:
       database:
         image: mariadb:10.6-focal
