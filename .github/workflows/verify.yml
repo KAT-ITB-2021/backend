@@ -16,7 +16,7 @@ jobs:
       - run: yarn install
       - run: yarn test
         env:
-          DB_PORT: ${{ job.services.database.ports['3306'] }}
+          DB_TEST_PORT: ${{ job.services.database.ports['3306'] }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
     services:
       database:

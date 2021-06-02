@@ -5,7 +5,7 @@
   "main": "app/index.js",
   "scripts": {
     "pretest": "NODE_ENV=test yarn sequelize db:migrate",
-    "test": "yarn pretest && NODE_ENV=test yarn jest && yarn posttest",
+    "test": "yarn pretest && yarn jest && yarn posttest",
     "posttest": "NODE_ENV=test yarn sequelize db:migrate:undo:all",
     "lint": "yarn eslint app/",
     "start": "node app/index.js"

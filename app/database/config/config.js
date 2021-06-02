@@ -13,7 +13,7 @@ module.exports = {
     "password": "",
     "database": "test",
     "host": "localhost",
-    "port": process.env.DB_PORT,
+    "port": process.env.DB_TEST_PORT,
     "dialect": "mariadb"
   },
   "production": {
