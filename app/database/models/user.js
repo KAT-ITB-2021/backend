@@ -8,6 +8,9 @@ module.exports = (sequelize, Sequelize) => {
     },
     role: {
       type: Sequelize.STRING
+    },
+    salt: {
+      type: Sequelize.STRING
     }
   });
   return User;
