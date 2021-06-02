@@ -4,6 +4,7 @@
   "private": true,
   "main": "app/index.js",
   "scripts": {
+    "lint": "yarn eslint app/",
     "start": "node app/index.js"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
+    "eslint": "^7.27.0",
     "jest": "^27.0.3",
     "supertest": "^6.1.3"
   }
