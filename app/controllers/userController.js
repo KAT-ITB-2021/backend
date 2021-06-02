@@ -31,10 +31,37 @@ module.exports = {
                 'role': user.role
               }, process.env.JWT_SECRET)
             );
-          }).catch(() => {
+          }).catch((err) => {
+            console.log(err);
             res.status(500).json({ message: 'Error when creating user'});
           });
         });
+      }
+    });
+  },
+
+  login(req, res, next){
+    const form = formidable();
+    form.parse(req, async (err, fields) => {
+      if(!fields.username || !fields.password) return res.status(400).json({ message: 'Login fail' });
+      const user = await User.findOne({where: { username: fields.username }});
+      if(user === null){
+        res.status(400).json({ message: 'Invalid user or password' });
+      }
+      else{
+        crypto.pbkdf2(fields.password, Buffer.from(user.salt, 'hex'), 50000, 64, 'sha512', (_, derivedKey) => {
+          if(derivedKey.toString('hex') === user.hashedPassword){
+            res.status(200).send(
+              jwt.sign({
+                'username': user.username,
+                'role': user.role
+              }, process.env.JWT_SECRET)
+            );
+          }
+          else{
+            res.status(400).json({ message: 'Invalid user or password' });
+          }
+        })
       }
     });
   }
