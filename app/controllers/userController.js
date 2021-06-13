@@ -55,12 +55,12 @@ module.exports = {
         else{
           crypto.pbkdf2(fields.password, Buffer.from(user.salt, 'hex'), 50000, 64, 'sha512', (_, derivedKey) => {
             if(derivedKey.toString('hex') === user.hashedPassword){
-              res.status(200).send(
-                jwt.sign({
+              res.status(200).json({
+                token: jwt.sign({
                   'username': user.username,
                   'role': user.role
                 }, process.env.JWT_SECRET)
-              );
+              });
             }
             else{
               res.status(400).json({ message: 'Invalid user or password' });
