@@ -7,8 +7,8 @@ describe('Test login', () => {
   test('Login invalid user', ()=>{
     return request(app)
       .post('/login')
-      .field('username', 'aaa')
-      .field('password', 'aaa')
+      .field('username', 'bbb')
+      .field('password', 'bbb')
       .then((response) => {
         expect(response.statusCode).toBe(400);
       })
