@@ -2,6 +2,7 @@ const formidable = require('formidable');
 const jwt = require('jsonwebtoken');
 
 const { User } = require('../database/models');
+const config = require('../config');
 const crypto = require('crypto');
 
 const CURRENT_ROLE = 'mentor';
@@ -16,7 +17,7 @@ module.exports = {
       }
       else{
         /* Berhasil parse form */
-        if(!fields.username || !fields.password) return res.status(400).json({ message: ''});
+        if(!fields.username || !fields.password) return res.status(400).json({ message: 'No username or password provided'});
         const salt = crypto.randomBytes(32);
         crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', (_, derivedKey) => {
           User.create({
@@ -25,12 +26,12 @@ module.exports = {
             salt: salt.toString('hex'),
             role: CURRENT_ROLE
           }).then((user) => {
-            res.status(200).send(
-              jwt.sign({
+            res.status(200).send({
+              token: jwt.sign({
                 'username': user.username,
                 'role': user.role
-              }, process.env.JWT_SECRET)
-            );
+              }, config.jwtSecret)
+            });
           }).catch((err) => {
             console.log(err);
             res.status(500).json({ message: 'Error when creating user'});
@@ -59,7 +60,7 @@ module.exports = {
                 token: jwt.sign({
                   'username': user.username,
                   'role': user.role
-                }, process.env.JWT_SECRET)
+                }, config.jwtSecret)
               });
             }
             else{

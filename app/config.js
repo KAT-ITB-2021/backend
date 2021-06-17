@@ -13,4 +13,9 @@ let express = {
  */
 let prefix = process.env.API_PREFIX || '';
 
-module.exports = {express, prefix};
+/**
+ * Kunci rahasia untuk proses signing JWT
+ */
+let jwtSecret = process.env.JWT_SECRET;
+
+module.exports = {express, prefix, jwtSecret};
