@@ -35,7 +35,7 @@ module.exports = {
    * Middleware untuk otentikasi role dengan kuasa "edit" konten
    */
   authEdit(req, res, next){
-    if(req.userToken.role === ROLES.pendikpus) next();
+    if(req.userToken.role === ROLES.admin) next();
     else res.status(403).send();
   }
 };
