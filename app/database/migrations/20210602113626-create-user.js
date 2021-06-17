@@ -18,6 +18,9 @@ module.exports = {
         type: Sequelize.STRING,
         unique: true
       },
+      kelompok: {
+        type: Sequelize.INTEGER
+      },
       hashedPassword: {
         type: Sequelize.STRING.BINARY
       },

@@ -25,6 +25,7 @@ module.exports = {
             name: fields.name,
             nim: fields.nim,
             email: fields.email,
+            kelompok: fields.kelompok,
             hashedPassword: derivedKey.toString('hex'),
             salt: salt.toString('hex'),
             role: CURRENT_ROLE
@@ -34,6 +35,7 @@ module.exports = {
                 name: user.name,
                 email: user.email,
                 nim: user.nim,
+                kelompok: user.kelompok,
                 role: user.role
               }, '1d')
             });
