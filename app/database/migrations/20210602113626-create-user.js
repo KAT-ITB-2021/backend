@@ -8,8 +8,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
+      nama: {
         type: Sequelize.STRING
+      },
+      nim: {
+        type: Sequelize.STRING(8)
+      },
+      email: {
+        type: Sequelize.STRING,
+        unique: true
       },
       hashedPassword: {
         type: Sequelize.STRING.BINARY
