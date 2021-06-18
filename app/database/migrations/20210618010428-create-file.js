@@ -1,33 +1,24 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Files', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      nama: {
+      materi: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+            model: 'Materis',
+        }
+      },
+      name: {
         type: Sequelize.STRING
       },
-      nim: {
-        type: Sequelize.STRING(8)
-      },
-      email: {
-        type: Sequelize.STRING,
-        unique: true
-      },
-      kelompok: {
-        type: Sequelize.INTEGER
-      },
-      hashedPassword: {
-        type: Sequelize.STRING.BINARY
-      },
-      salt: {
-        type: Sequelize.STRING.BINARY
-      },
-      role: {
+      path: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -39,8 +30,9 @@ module.exports = {
         type: Sequelize.DATE
       }
     });
+
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Files');
   }
 };

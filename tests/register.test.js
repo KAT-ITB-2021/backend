@@ -7,7 +7,9 @@ describe('Test register', () => {
   test('Register valid user', ()=>{
     return request(app)
       .post('/register')
-      .field('username', 'aaa')
+      .field('email', 'aaa')
+      .field('name', 'a')
+      .field('nim', '00000000')
       .field('password', 'aaa')
       .then((response) => {
         expect(response.statusCode).toBe(200);

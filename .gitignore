@@ -17,6 +17,7 @@ node_modules/
 
 # config, dotenv (secrets)
 .env
+gkey.json
 
 # database
 database_datas
