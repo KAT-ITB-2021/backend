@@ -2,7 +2,6 @@
 const {
   Model
 } = require('sequelize');
-const { File } = require('./index');
 module.exports = (sequelize, DataTypes) => {
   class Materi extends Model {
     /**

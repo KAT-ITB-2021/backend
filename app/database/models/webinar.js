@@ -15,6 +15,8 @@ module.exports = (sequelize, DataTypes) => {
   };
   Webinar.init({
     ytid: DataTypes.STRING,
+    judul: DataTypes.STRING,
+    deskripsi: DataTypes.STRING,
     start: DataTypes.DATE,
     end: DataTypes.DATE
   }, {

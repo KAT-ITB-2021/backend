@@ -11,6 +11,12 @@ module.exports = {
       ytid: {
         type: Sequelize.STRING
       },
+      judul: {
+        type: Sequelize.STRING
+      },
+      deskripsi: {
+        type: Sequelize.STRING
+      },
       start: {
         type: Sequelize.DATE
       },

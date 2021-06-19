@@ -5,7 +5,7 @@ const { Op } = require('sequelize');
 module.exports = {
   /**
    * Route to add Webinar
-   * form fields: `ytid`, `start`, `end`
+   * form fields: `ytid`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
   addWebinar(req, res){
@@ -15,10 +15,10 @@ module.exports = {
       else{
         const start = new Date(parseInt(fields.start));
         const end = new Date(parseInt(fields.end));
-        const { ytid } = fields;
+        const { ytid, judul, deskripsi } = fields;
         try{
           await Webinar.create({
-            start, end, ytid
+            start, end, ytid, judul, deskripsi
           });
           res.json({message: 'success adding webinar'});
         }
@@ -45,7 +45,7 @@ module.exports = {
   },
   /**
    * Route to edit webinar
-   * form fields: `ytid`, `start`, `end`
+   * form fields: `ytid`, `judul`, `deskripsi`, `start`, `end`
    * all fields optional
    */
   editWebinar(req, res){
@@ -77,11 +77,15 @@ module.exports = {
   /**
    * Route to list all webinars
    * return object with only one proprety, `webinar`, which is an array of Webinar:
-   * [{`id`, `ytid`, `start`, `end`}]
+   * [{`id`, `ytid`, `judul, `start`, `end`}]
    */
   async listWebinar(_, res){
     try{
-      const webinar = Webinar.findAll();
+      const webinar = Webinar.findAll({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt', 'deskripsi']
+        }
+      });
       res.json({webinar});
     }
     catch(err){
@@ -92,7 +96,7 @@ module.exports = {
   /**
    * Route to get current webinar
    * return object of type `webinar`:
-   * {`id`, `ytid`, `start`, `end`}
+   * {`id`, `ytid`, `judul`, `deskripsi`, `start`, `end`}
    * could be empty if there is no webinar
    */
   async currentWebinar(_, res){
@@ -108,6 +112,9 @@ module.exports = {
               [Op.gte]: current
             }}
           ]
+        },
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
         }
       });
       res.json(webinar);
