@@ -8,7 +8,7 @@ router.post('/materi', getAllMateri);
 router.post('/materi/:id', getMateriById);
 router.post('/materi/admin*', authEdit);
 router.post('/materi/admin/add', addMateri);
-router.post('/materi/admin/remove', removeMateri);
+router.post('/materi/admin/remove/:id', removeMateri);
 router.post('/materi/admin/edit/:id', editMateri);
 
 module.exports = router;
