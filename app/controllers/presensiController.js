@@ -1,6 +1,5 @@
 const formidable = require('formidable');
 const { JadwalPresensi, PresensiPeserta } = require('../database/models');
-const { uploadFile } = require('../helper/uploader');
 
 module.exports = {
   /**
@@ -124,7 +123,7 @@ module.exports = {
   async hapuskanPresensi(req, res){
     const id = req.params.id;
     try{
-      const presensi = await PreseniPeserta.findOne({
+      const presensi = await PresensiPeserta.findOne({
         where: {
           user: req.userToken.id,
           jadwal: id
@@ -176,10 +175,10 @@ module.exports = {
    */
   async listPresensiPesertaOther(req, res){
     const form = formidable();
-    form.parse(req, (err, fields) => {
+    form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        if(!userid) res.status(400).json({message: 'userid must not be empty'});
+        if(!fields.userid) res.status(400).json({message: 'userid must not be empty'});
         else{
           try{
             const presensi = await PresensiPeserta.findAll({
