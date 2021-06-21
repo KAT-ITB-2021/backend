@@ -6,7 +6,7 @@ module.exports = {
   /**
    * Route to add Mentoring for specific kelompok
    * form encoded fields:
-   * `jadwal`, `link`
+   * `jadwal`, `link`, `kelompok`
    * `jadwal` is datetime encoded as seconds since UNIX epoch
    */
   addMentoring(req, res){
@@ -15,10 +15,10 @@ module.exports = {
       if(err) res.status(400).json({ message: 'error parsing form' });
       else{
         const jadwal = new Date(fields.jadwal);
-        const { link } = fields;
+        const { link, kelompok } = fields;
         try{
           await Mentoring.create({
-            jadwal, link
+            jadwal, link, kelompok
           });
           res.json({message: 'success adding mentoring'});
         }
@@ -30,9 +30,9 @@ module.exports = {
     });
   },
   /**
-   * Route to edit mentoring by mentor
+   * Route to edit mentoring
    * form encoded fields:
-   * `jadwal`, `link`
+   * `jadwal`, `link`, `kelompok`
    * `jadwal` is datetime encoded as seconds since UNIX epoch
    * both are optional
    */
@@ -43,13 +43,14 @@ module.exports = {
       if(err) res.status(400).json({ message: 'error parsing form' });
       else{
         const jadwal = new Date(fields.jadwal);
-        const { link } = fields;
+        const { link, kelompok } = fields;
         try{
           const mentoring = await Mentoring.findOne({
             id
           });
           if(jadwal) mentoring.jadwal = jadwal;
           if(link) mentoring.link = link;
+          if(kelompok) mentoring.kelompok = kelompok;
           await mentoring.save();
           res.json({message: 'success editing mentoring'});
         }
