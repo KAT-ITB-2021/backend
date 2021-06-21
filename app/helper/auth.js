@@ -37,5 +37,12 @@ module.exports = {
   authEdit(req, res, next){
     if(req.userToken.role === ROLES.admin) next();
     else res.status(403).send();
+  },
+  /**
+   * Middleware untuk otentikasi role dengan kuasa melihat submisi tugas ('mentor')
+   */
+  authMentor(req, res, next){
+    if(req.userToken.role === ROLES.pendikpus) next();
+    else res.status(403).send();
   }
 };

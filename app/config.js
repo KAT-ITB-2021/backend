@@ -18,4 +18,9 @@ let prefix = process.env.API_PREFIX || '';
  */
 let jwtSecret = process.env.JWT_SECRET;
 
-module.exports = {express, prefix, jwtSecret};
+/**
+ * Nama bucket di google cloud storage
+ */
+let bucketName = process.env.BUCKET_NAME;
+
+module.exports = {express, prefix, jwtSecret, bucketName};

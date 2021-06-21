@@ -1,5 +1,6 @@
 // Imports the Google Cloud client library
 const {Storage} = require('@google-cloud/storage');
+const {bucketName} = require('../config');
 
 // For more information on ways to initialize Storage, please see
 // https://googleapis.dev/nodejs/storage/latest/Storage.html
@@ -9,12 +10,6 @@ const storage = new Storage();
 
 // Creates a client from a Google service account key
 // const storage = new Storage({keyFilename: 'key.json'});
-
-/**
- * TODO(developer): Uncomment these variables before running the sample.
- */
-// The ID of your GCS bucket
-const bucketName = 'storage-kat';
 
 async function uploadFile(localFile, destination) {
   await storage.bucket(bucketName).upload(localFile, {
