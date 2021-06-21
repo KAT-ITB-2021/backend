@@ -5,7 +5,7 @@ const { generateToken } = require('../helper/auth');
 const crypto = require('crypto');
 const { ROLES } = require('../helper/constants');
 
-const CURRENT_ROLE = ROLES.admin;
+const CURRENT_ROLE = ROLES.mentor;
 
 module.exports = {
   register(req, res, next) {
