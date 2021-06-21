@@ -56,7 +56,7 @@ module.exports = {
       else{
         const start = new Date(parseInt(fields.start));
         const end = new Date(parseInt(fields.end));
-        const { ytid } = fields;
+        const { ytid, judul, deskripsi } = fields;
         try{
           const webinar = Webinar.findOne({
             where: { id }
@@ -64,6 +64,8 @@ module.exports = {
           if(start) webinar.start = start;
           if(end) webinar.end = end;
           if(ytid) webinar.ytid = ytid;
+          if(judul) webinar.judul = judul;
+          if(deskripsi) webinar.deskripsi = deskripsi;
           await webinar.save();
           res.json({message: 'success editing webinar'});
         }
