@@ -8,13 +8,26 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      username: {
+      nama: {
         type: Sequelize.STRING
+      },
+      nim: {
+        type: Sequelize.STRING(8)
+      },
+      email: {
+        type: Sequelize.STRING,
+        unique: true
+      },
+      kelompok: {
+        type: Sequelize.INTEGER
       },
       hashedPassword: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING.BINARY
       },
       salt: {
+        type: Sequelize.STRING.BINARY
+      },
+      role: {
         type: Sequelize.STRING
       },
       createdAt: {

@@ -4,9 +4,17 @@
   "private": true,
   "main": "app/index.js",
   "scripts": {
-    "start": "node app/index.js"
+    "migrate": "yarn sequelize db:migrate",
+    "pretest": "NODE_ENV=test yarn sequelize db:migrate",
+    "test": "yarn pretest && yarn jest && yarn posttest",
+    "posttest": "NODE_ENV=test yarn sequelize db:migrate:undo:all",
+    "lint": "yarn eslint app/",
+    "start": "node app/index.js",
+    "watch": "yarn migrate && yarn nodemon"
   },
   "dependencies": {
+    "@google-cloud/storage": "^5.8.5",
+    "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
@@ -16,7 +24,9 @@
     "sequelize-cli": "^6.2.0"
   },
   "devDependencies": {
+    "eslint": "^7.27.0",
     "jest": "^27.0.3",
+    "nodemon": "^2.0.7",
     "supertest": "^6.1.3"
   }
 }

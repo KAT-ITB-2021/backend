@@ -1,13 +1,31 @@
 services:
+  backend:
+    container_name: kat_backend
+    image: node:14
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      - NODE_ENV=development
+    working_dir: /usr/src/app
+    entrypoint: yarn watch -L
+    environment:
+      - DB_HOST=database
+      - JWT_SECRET=${JWT_SECRET}
   database:
     container_name: database
     image: mariadb:10.6-focal
-    ports:
-      - ${DB_PORT}:${DB_PORT}
     volumes:
       - ./database_datas:/var/lib/mysql
     environment:
-      - MARIADB_RANDOM_ROOT_PASSWORD=1
-      - MARIADB_USER=${DB_USER}
-      - MARIADB_PASSWORD=${DB_PASS}
+      - MARIADB_ROOT_PASSWORD=${DB_PASS}
       - MARIADB_DATABASE=${DB_NAME}
+  database_test:
+    container_name: database_test
+    image: mariadb:10.6-focal
+    ports:
+      - 3307:3306
+    environment:
+      - MARIADB_ALLOW_EMPTY_ROOT_PASSWORD=1
+      - MARIADB_DATABASE=test

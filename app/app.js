@@ -1,8 +1,11 @@
 const express = require('express');
-
-const db = require('./database/models');
+const cors = require('cors');
 
 const app = express();
-app.use('/api', require('./routes/login'));
+app.use(cors());
+app.use('/', require('./routes/login'));
+app.use('/', require('./routes/register'));
+app.use('/', require('./routes/materi'));
+app.use('/', require('./routes/tugas'));
 
 module.exports = app;
