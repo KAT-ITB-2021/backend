@@ -22,7 +22,7 @@ module.exports = {
         const salt = crypto.randomBytes(32);
         crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', (_, derivedKey) => {
           User.create({
-            name: fields.name,
+            nama: fields.name,
             nim: fields.nim,
             email: fields.email,
             kelompok: fields.kelompok,
