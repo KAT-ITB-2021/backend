@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   DetailMentoring.init({
+    day: DataTypes.INTEGER,
     judul: DataTypes.STRING,
     deskripsi: DataTypes.STRING,
     start: DataTypes.DATE,
