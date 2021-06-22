@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   JadwalPresensi.init({
+    judul: DataTypes.STRING,
     start: DataTypes.DATE,
     end: DataTypes.DATE
   }, {
