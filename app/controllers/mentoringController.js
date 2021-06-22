@@ -78,7 +78,7 @@ module.exports = {
   /**
    * Route to get latest active Mentoring based on Kelompok
    * returns Mentoring object:
-   * {`id`, `kelompok`, `link`, `detail`: {'judul`, `deskripsi`, `start`, `end`}}
+   * {`id`, kelompok`, `link`, `detail`: {`day`, `judul`, `deskripsi`, `start`, `end`}}
    */
   async getLatestMentoring(req, res) {
     const current = new Date();

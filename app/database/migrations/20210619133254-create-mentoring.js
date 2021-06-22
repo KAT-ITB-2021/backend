@@ -16,7 +16,6 @@ module.exports = {
       },
       detail: {
         type: Sequelize.INTEGER,
-        onDelete: 'CASCADE',
         references: {
           model: 'DetailMentorings'
         }
