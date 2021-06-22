@@ -1,24 +1,23 @@
 const formidable = require('formidable');
 const { Op } = require('sequelize');
-const { Mentoring } = require('../database/models');
+const { Mentoring, DetailMentoring } = require('../database/models');
 
 module.exports = {
   /**
    * Route to add Mentoring for specific kelompok
    * form encoded fields:
-   * `jadwal`, `link`, `kelompok`
-   * `jadwal` is datetime encoded as seconds since UNIX epoch
+   * `detail`, `link`, `kelompok`
+   * `detail` is id of Mentoring Detail associated
    */
   addMentoring(req, res){
     const form = formidable();
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({ message: 'error parsing form' });
       else{
-        const jadwal = new Date(fields.jadwal);
-        const { link, kelompok } = fields;
+        const { detail, link, kelompok } = fields;
         try{
           await Mentoring.create({
-            jadwal, link, kelompok
+            detail, link, kelompok
           });
           res.json({message: 'success adding mentoring'});
         }
@@ -32,8 +31,8 @@ module.exports = {
   /**
    * Route to edit mentoring
    * form encoded fields:
-   * `jadwal`, `link`, `kelompok`
-   * `jadwal` is datetime encoded as seconds since UNIX epoch
+   * `detail`, `link`, `kelompok`
+   * `detail` is id of Mentoring Detail associated
    * both are optional
    */
   editMentoring(req, res){
@@ -42,13 +41,12 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({ message: 'error parsing form' });
       else{
-        const jadwal = new Date(fields.jadwal);
-        const { link, kelompok } = fields;
+        const { detail, link, kelompok } = fields;
         try{
           const mentoring = await Mentoring.findOne({
             id
           });
-          if(jadwal) mentoring.jadwal = jadwal;
+          if(detail) mentoring.detail = detail;
           if(link) mentoring.link = link;
           if(kelompok) mentoring.kelompok = kelompok;
           await mentoring.save();
@@ -80,21 +78,32 @@ module.exports = {
   /**
    * Route to get latest active Mentoring based on Kelompok
    * returns Mentoring object:
-   * {`id`, `kelompok`, `jadwal`, `link`}
+   * {`id`, `kelompok`, `link`, `detail`: {'judul`, `deskripsi`, `start`, `end`}}
    */
   async getLatestMentoring(req, res) {
     const current = new Date();
     try{
       const mentoring = await Mentoring.findOne({
         where: {
-          jadwal: {
-            [Op.le]: current
-          },
           kelompok: req.userToken.kelompok
         },
         order: [['jadwal', 'DESC']],
         attributes: {
           exclude: ['createdAt', 'updatedAt']
+        },
+        include: {
+          model: DetailMentoring,
+          attributes: {
+            exclude: ['createdAt', 'updatedAt']
+          },
+          where: {
+            [Op.and]: [
+              {
+                start: { [Op.le]: current },
+                end: { [Op.ge]: current}
+              }
+            ]
+          }
         }
       });
       res.json(mentoring);
@@ -107,7 +116,7 @@ module.exports = {
   /**
    * Route to get all mentoring
    * returns object with one property, `mentoring`, which holds array of Mentoring:
-   * [{`id`, `kelompok`, `jadwal`, `link`}]
+   * [{`id`, `kelompok`, `detail`, `link`}]
    */,
   async getAllMentoring(req, res){
     try{

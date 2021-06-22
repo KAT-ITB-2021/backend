@@ -4,8 +4,8 @@ const { JadwalPresensi, PresensiPeserta } = require('../database/models');
 module.exports = {
   /**
    * Route to add JadwalPresensi
-   * two fields in form is needed:
-   * `start` and `end`, both of which is formatted as seconds since UNIX epochs.
+   * three fields in form is needed:
+   * `judul`, `start`, and `end`, both of which is formatted as seconds since UNIX epochs.
    */
   addJadwal(req, res){
     const form = formidable();
@@ -14,9 +14,10 @@ module.exports = {
       else{
         const start = new Date(parseInt(fields.start));
         const end = new Date(parseInt(fields.end));
+        const { judul } = fields;
         try{
           await JadwalPresensi.create({
-            start, end
+            judul, start, end
           });
           res.json({message: 'success add jadwal'});
         }
@@ -46,8 +47,8 @@ module.exports = {
   /**
    * Route to edit JadwalPresensi by Id
    * same requirements as addJadwal:
-   * two fields in form is needed:
-   * `start` and `end`, both of which is formatted as seconds since UNIX epochs.
+   * three fields in form is needed:
+   * `judul`, `start` and `end`, both of which is formatted as seconds since UNIX epochs.
    */
   editJadwal(req, res){
     const id = req.params.id;
@@ -57,10 +58,12 @@ module.exports = {
       else{
         const start = new Date(parseInt(fields.start)) ?? false;
         const end = new Date(parseInt(fields.end)) ?? false;
+        const { judul } = fields;
         try{
           const jadwal = await JadwalPresensi.findOne({
             where: { id }
           });
+          if(judul) jadwal.judul = judul;
           if(start) jadwal.start = start;
           if(end) jadwal.end = end;
           await jadwal.save();
@@ -76,11 +79,15 @@ module.exports = {
   /**
    * Route to get all JadwalPresensi
    * returns object with one property, `jadwal`, which consists of array of JadwalPresensi:
-   * [{`id`, `start`, `end`}]
+   * [{`id`, `judul`, `start`, `end`}]
    */
   async getAllJadwal(_, res){
     try{
-      const jadwal = await JadwalPresensi.findAll();
+      const jadwal = await JadwalPresensi.findAll({
+        attributes: {
+          exclude: ['createdAt', 'updatedAt']
+        }
+      });
       res.json({jadwal});
     }
     catch(err){
@@ -145,7 +152,7 @@ module.exports = {
   /**
    * Route to list PresensiPeserta by id
    * returns object with one property, `presensi`, which contains array of PresensiPeserta:
-   * [{`id`, `hadir`, `jadwal`: {`id`, `start`, `end`}}]
+   * [{`id`, `hadir`, `jadwal`: {`id`, `judul`, `start`, `end`}}]
    */
   async listPresensiPeserta(req, res){
     try{
@@ -155,7 +162,7 @@ module.exports = {
         },
         include: {
           model: JadwalPresensi,
-          attributes: ['id', 'start', 'end']
+          attributes: ['id', 'judul', 'start', 'end']
         },
         attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
       });
@@ -171,7 +178,7 @@ module.exports = {
    * Used by admin
    * form fields needed: `userid`
    * returns object with one property, `presensi`, which contains array of PresensiPeserta:
-   * [{`id`, `hadir`, `jadwal`: {`id`, `start`, `end`}}]
+   * [{`id`, `hadir`, `jadwal`: {`id`, `judul`, `start`, `end`}}]
    */
   async listPresensiPesertaOther(req, res){
     const form = formidable();
@@ -187,7 +194,7 @@ module.exports = {
               },
               include: {
                 model: JadwalPresensi,
-                attributes: ['id', 'start', 'end']
+                attributes: ['id', 'judul', 'start', 'end']
               },
               attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
             });
