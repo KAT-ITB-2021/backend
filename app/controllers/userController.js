@@ -68,7 +68,8 @@ module.exports = {
                   name: user.name,
                   email: user.email,
                   nim: user.nim,
-                  role: user.role
+                  role: user.role,
+                  kelompok: user.kelompok
                 }, '1d')
               });
             }
