@@ -68,7 +68,8 @@ module.exports = {
                   name: user.name,
                   email: user.email,
                   nim: user.nim,
-                  role: user.role
+                  role: user.role,
+                  kelompok: user.kelompok
                 }, '1d')
               });
             }
@@ -76,6 +77,39 @@ module.exports = {
               res.status(400).json({ message: 'Invalid user or password' });
             }
           });
+        }
+      }
+    });
+  },
+
+  changePassword(req, res){
+    const form = formidable();
+    form.parse(req, (err, fields) => {
+      if(err) res.status(400).json({message: 'error parsing form'});
+      else{
+        const { oldPassword, newPassword } = fields;
+        const { id } = req.userToken;
+        const user = User.findOne({
+          where: { id }
+        });
+        const salt = Buffer.from(user.salt, 'hex');
+        const hashedOld = crypto.pbkdf2Sync(oldPassword, salt);
+        if(hashedOld === user.hashedPassword){
+          const newSalt = crypto.randomBytes(32);
+          const hashedNew = crypto.pbkdf2Sync(newPassword, newSalt);
+          user.salt = newSalt;
+          user.hashedPassword = hashedNew;
+          try{
+            user.save();
+            res.json({message: 'success updating password'});
+          }
+          catch(err){
+            console.log(err);
+            res.status(500).json({message: 'error updating password'});
+          }
+        }
+        else{
+          res.status(400).json({message: 'password invalid'});
         }
       }
     });
