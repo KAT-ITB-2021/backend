@@ -81,7 +81,7 @@ module.exports = {
    */
   async listWebinar(_, res){
     try{
-      const webinar = Webinar.findAll({
+      const webinar = await Webinar.findAll({
         attributes: {
           exclude: ['createdAt', 'updatedAt', 'deskripsi']
         }
@@ -100,9 +100,9 @@ module.exports = {
    * could be empty if there is no webinar
    */
   async currentWebinar(_, res){
-    const current = new Date();
+    const current = Date.now();
     try{
-      const webinar = Webinar.findOne({
+      const webinar = await Webinar.findOne({
         where: {
           [Op.and]: [
             { start: {
