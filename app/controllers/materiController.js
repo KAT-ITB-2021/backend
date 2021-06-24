@@ -20,21 +20,23 @@ module.exports = {
         const materi = await Materi.create({
           bagian, judul, deskripsi, embed
         });
-        files.file.forEach(async (file, i) => {
-          try{
-            const pathInBucket = `${judul}_${i}`;
-            await uploadFile(file.path, pathInBucket);
-            await File.create({
-              name: file.name,
-              path: pathInBucket,
-              materi: materi.id
-            });
-          }
-          catch(err){
-            console.log(err);
-            res.status(500).send({message: 'upload error'});
-          }
-        });
+        if(files.file){
+          files.file.forEach(async (file, i) => {
+            try{
+              const pathInBucket = `${judul}_${i}`;
+              await uploadFile(file.path, pathInBucket);
+              await File.create({
+                name: file.name,
+                path: pathInBucket,
+                materi: materi.id
+              });
+            }
+            catch(err){
+              console.log(err);
+              res.status(500).send({message: 'upload error'});
+            }
+          });
+        }
         res.json({message: 'success upload'});
       }
     });
