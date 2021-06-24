@@ -120,8 +120,29 @@ module.exports = {
    */,
   async getAllMentoring(req, res){
     try{
-      const mentoring = await Mentoring.findAll();
+      const mentoring = await Mentoring.findAll({
+        include: {
+          model: DetailMentoring,
+          attributes: ['judul']
+        }
+      });
       res.json({mentoring});
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'error fetching mentoring'});
+    }
+  },
+  /**
+   * Route to get one mentoring
+   * returns Mentoring object:
+   * {`id`, kelompok`, `link`, `detail`}
+   */
+  async getOneMentoring(req, res){
+    const id = req.params.id;
+    try{
+      const mentoring = await Mentoring.findOne({where: {id}});
+      res.json(mentoring);
     }
     catch(err){
       console.log(err);
