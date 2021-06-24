@@ -9,5 +9,6 @@ app.use('/', require('./routes/materi'));
 app.use('/', require('./routes/tugas'));
 app.use('/', require('./routes/webinar'));
 app.use('/', require('./routes/presensi'));
+app.use('/', require('./routes/mentoring'));
 
 module.exports = app;

@@ -11,12 +11,18 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Mentoring.belongsTo(models.DetailMentoring, {foreignKey: 'detail'});
     }
   };
   Mentoring.init({
     kelompok: DataTypes.STRING,
-    jadwal: DataTypes.DATE,
-    link: DataTypes.STRING
+    link: DataTypes.STRING,
+    detail: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'DetailMentorings'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Mentoring',
