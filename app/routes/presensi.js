@@ -6,8 +6,8 @@ const { getAllJadwal, daftarkanPresensi, hapuskanPresensi, addJadwal, editJadwal
 router.post('/presensi*', parseToken);
 router.post('/presensi', getAllJadwal);
 router.post('/presensi/list', listPresensiPeserta);
-router.post('/presensi/hadir', daftarkanPresensi);
-router.post('/presensi/tidakhadir', hapuskanPresensi);
+router.post('/presensi/hadir/:id', daftarkanPresensi);
+router.post('/presensi/tidakhadir/:id', hapuskanPresensi);
 router.post('/presensi/admin*', authEdit);
 router.post('/presensi/admin/add', addJadwal);
 router.post('/presensi/admin/edit/:id', editJadwal);
