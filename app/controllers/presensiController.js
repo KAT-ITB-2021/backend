@@ -128,6 +128,7 @@ module.exports = {
       });
       if(presensi){
         presensi.hadir = true;
+        await presensi.save();
       }
       else{
         await PresensiPeserta.create({
@@ -157,6 +158,7 @@ module.exports = {
       });
       if(presensi){
         presensi.hadir = false;
+        await presensi.save();
         res.json({message: 'success removing presensi'});
       }
       else{
