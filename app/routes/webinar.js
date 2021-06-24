@@ -1,7 +1,7 @@
 const express = require('express');
 const router = new express.Router();
 const { parseToken, authEdit } = require('../helper/auth');
-const { currentWebinar, addWebinar, editWebinar, removeWebinar, listWebinar } = require('../controllers/webinarController');
+const { currentWebinar, addWebinar, editWebinar, removeWebinar, listWebinar, getWebinarById } = require('../controllers/webinarController');
 
 router.post('/webinar*', parseToken);
 router.post('/webinar/current', currentWebinar);
@@ -10,5 +10,6 @@ router.post('/webinar/admin/add', addWebinar);
 router.post('/webinar/admin/edit/:id', editWebinar);
 router.post('/webinar/admin/remove/:id', removeWebinar);
 router.post('/webinar/admin/list', listWebinar);
+router.post('/webinar/admin/get/:id', getWebinarById);
 
 module.exports = router;

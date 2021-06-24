@@ -96,6 +96,25 @@ module.exports = {
     }
   },
   /**
+   * Route to get JadwalPresensi by id
+   * Returns JawdalPresensi:
+   * {`id`, `judul`, `start`, `end`}
+   */
+  async getJadwalById(req, res){
+    const { id } = req.params;
+    try{
+      const jadwal = await JadwalPresensi.findOne({
+        where: { id },
+        exclude: ['createdAt', 'updatedAt']
+      });
+      res.json(jadwal);
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'error getting jadwal'});
+    }
+  },
+  /**
    * Route to add presensi or set presensi to true by JadwalPresensi id
    */
   async daftarkanPresensi(req, res){
@@ -109,6 +128,7 @@ module.exports = {
       });
       if(presensi){
         presensi.hadir = true;
+        await presensi.save();
       }
       else{
         await PresensiPeserta.create({
@@ -138,6 +158,7 @@ module.exports = {
       });
       if(presensi){
         presensi.hadir = false;
+        await presensi.save();
         res.json({message: 'success removing presensi'});
       }
       else{

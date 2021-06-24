@@ -64,6 +64,9 @@ module.exports = {
       else{
         res.json(fields);
         const materi = await Materi.findOne({ id: req.params.id });
+        if(fields.bagian){
+          materi.bagian = fields.bagian;
+        }
         if(fields.judul){
           materi.judul = fields.judul;
         }
