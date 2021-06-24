@@ -1,5 +1,5 @@
 const formidable = require('formidable');
-const { MentoringDetail, Mentoring } = require('../database/models');
+const { DetailMentoring, Mentoring } = require('../database/models');
 
 module.exports = {
   /**
@@ -7,16 +7,16 @@ module.exports = {
    * required fields: `day`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
-  addMentoringDetail(req, res){
+  addDetailMentoring(req, res){
     const form = formidable();
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error adding mentoring detail'});
       else{
         const { day, judul, deskripsi } = fields;
-        const start = new Date(fields.start);
-        const end = new Date(fields.end);
+        const start = new Date(parseInt(fields.start));
+        const end = new Date(parseInt(fields.end));
         try{
-          await MentoringDetail.create({
+          await DetailMentoring.create({
             day, judul, deskripsi, start, end
           });
           res.json({message: 'success adding mentoring detail'});
@@ -33,17 +33,17 @@ module.exports = {
    * optional fields: `day`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
-  editMentoringDetail(req, res){
+  editDetailMentoring(req, res){
     const { id } = req.params;
     const form = formidable();
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error editing mentoring detail'});
       else{
         const { day, judul, deskripsi } = fields;
-        const start = new Date(fields.start);
-        const end = new Date(fields.end);
+        const start = new Date(parseInt(fields.start));
+        const end = new Date(parseInt(fields.end));
         try{
-          const mentoring = await MentoringDetail.findOne({
+          const mentoring = await DetailMentoring.findOne({
             where: { id }
           });
           if(day) mentoring.day = day;
@@ -62,10 +62,10 @@ module.exports = {
   /**
    * Route to delete Mentoring Detail by id
    */
-  async removeMentoringDetail(req, res){
+  async removeDetailMentoring(req, res){
     const { id } = req.params;
     try{
-      await MentoringDetail.destroy({
+      await DetailMentoring.destroy({
         where: { id }
       });
       res.json({message: 'success removing mentoring detail'});
@@ -80,9 +80,9 @@ module.exports = {
    * returns object with one property, `mentoringDetails`, which contains an array of juduls.
    * {`mentoringDetails`: [{`id`, `judul`}]}
    */
-  async getAllMentoringDetails(_, res){
+  async getAllDetailMentorings(_, res){
     try{
-      const mentoringDetails = await MentoringDetail.findAll({
+      const mentoringDetails = await DetailMentoring.findAll({
         attributes: ['id', 'judul']
       });
       res.json({mentoringDetails});
@@ -94,13 +94,13 @@ module.exports = {
   },
   /**
    * Route to get one mentoring details
-   * returns MentoringDetail object:
+   * returns DetailMentoring object:
    * `id`, `day`, `judul`, `deskripsi`, `start`, `end`
    */
-  async getOneMentoringDetail(req, res){
+  async getOneDetailMentoring(req, res){
     const { id } = req.params;
     try{
-      const mentoringDetail = await MentoringDetail.findOne({
+      const mentoringDetail = await DetailMentoring.findOne({
         where: { id },
         attributes: {
           exclude: ['createdAt', 'updatedAt']

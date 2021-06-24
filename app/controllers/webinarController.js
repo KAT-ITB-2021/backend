@@ -125,5 +125,23 @@ module.exports = {
       console.log(err);
       res.status(500).json({message: 'error finding webinar'});
     }
+  },
+  /**
+   * Route to get webinar by Id
+   * return object of type `webinar`:
+   * {`id`, `ytid`, `judul`, `deskripsi`, `start`, `end`}
+   */
+  async getWebinarById(req, res){
+    const { id } = req.params;
+    try{
+      const webinar = await Webinar.findOne({
+        where: { id }
+      });
+      res.json(webinar);
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'could not fetch webinar'});
+    }
   }
 };
