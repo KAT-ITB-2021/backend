@@ -1,5 +1,6 @@
 const formidable = require('formidable');
 const { JadwalPresensi, PresensiPeserta } = require('../database/models');
+const { unixSecondsToDate } = require('../helper/parseUnix');
 
 module.exports = {
   /**
@@ -12,8 +13,8 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         const { judul } = fields;
         try{
           await JadwalPresensi.create({
@@ -56,8 +57,8 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start)) ?? false;
-        const end = new Date(parseInt(fields.end)) ?? false;
+        const start = unixSecondsToDate(fields.start) ?? false;
+        const end = unixSecondsToDate(fields.end) ?? false;
         const { judul } = fields;
         try{
           const jadwal = await JadwalPresensi.findOne({
