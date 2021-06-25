@@ -121,9 +121,12 @@ module.exports = {
   async getAllMentoring(req, res){
     try{
       const mentoring = await Mentoring.findAll({
+        where: {
+          kelompok: req.userToken.kelompok
+        },
         include: {
           model: DetailMentoring,
-          attributes: ['judul', 'deskripsi', 'start', 'end']
+          attributes: ['judul', 'deskripsi', 'start', 'end'],
         }
       });
       res.json({mentoring});
