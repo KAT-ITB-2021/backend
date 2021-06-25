@@ -137,6 +137,26 @@ module.exports = {
     }
   },
   /**
+   * Route to get all mentoring by admin
+   * returns object with one property, `mentoring`, which holds array of Mentoring:
+   * [{`id`, `kelompok`, `detail`, `link`}]
+   */
+  async getAllMentoringAdmin(req, res){
+    try{
+      const mentoring = await Mentoring.findAll({
+        include: {
+          model: DetailMentoring,
+          attributes: ['judul'],
+        }
+      });
+      res.json({mentoring});
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'error fetching mentoring'});
+    }
+  },
+  /**
    * Route to get one mentoring
    * returns Mentoring object:
    * {`id`, kelompok`, `link`, `detail`}
