@@ -74,7 +74,7 @@ module.exports = {
         if(fields.embed){
           materi.link = fields.embed;
         }
-        materi.save();
+        await materi.save();
         res.json({message: 'Edit success'});
       }
     });

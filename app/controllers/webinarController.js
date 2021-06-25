@@ -58,7 +58,7 @@ module.exports = {
         const end = new Date(parseInt(fields.end));
         const { ytid, judul, deskripsi } = fields;
         try{
-          const webinar = Webinar.findOne({
+          const webinar = await Webinar.findOne({
             where: { id }
           });
           if(start) webinar.start = start;

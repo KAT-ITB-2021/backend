@@ -51,6 +51,7 @@ module.exports = {
           if(deskripsi) mentoring.deskripsi = deskripsi;
           if(start) mentoring.start = start;
           if(end) mentoring.end = end;
+          await mentoring.save();
         }
         catch(err){
           console.log(err);
