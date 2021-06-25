@@ -6,6 +6,7 @@ const { addDetailMentoring, editDetailMentoring, removeDetailMentoring, getAllDe
 
 router.post('/mentoring*', parseToken);
 router.post('/mentoring/now', getLatestMentoring);
+router.post('/mentoring/getall', getAllMentoring);
 router.post('/mentoring/admin*', authEdit);
 router.post('/mentoring/admin/add', addMentoring);
 router.post('/mentoring/admin/edit/:id', editMentoring);
