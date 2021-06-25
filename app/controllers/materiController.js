@@ -89,7 +89,11 @@ module.exports = {
    */
   async getAllMateri(_, res){
     const materis = await Materi.findAll({
-      attributes: ['id', 'bagian', 'judul']
+      attributes: ['id', 'bagian', 'judul', 'deskripsi'],
+      include: {
+        model: File,
+        attributes: ['name', 'path']
+      }
     });
     res.json({materis});
   },
