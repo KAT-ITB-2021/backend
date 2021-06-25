@@ -44,7 +44,7 @@ module.exports = {
         const { detail, link, kelompok } = fields;
         try{
           const mentoring = await Mentoring.findOne({
-            id
+            where: { id }
           });
           if(detail) mentoring.detail = detail;
           if(link) mentoring.link = link;
