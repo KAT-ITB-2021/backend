@@ -123,7 +123,7 @@ module.exports = {
       const mentoring = await Mentoring.findAll({
         include: {
           model: DetailMentoring,
-          attributes: ['judul']
+          attributes: ['judul', 'deskripsi', 'start', 'end']
         }
       });
       res.json({mentoring});
