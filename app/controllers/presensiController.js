@@ -128,10 +128,10 @@ module.exports = {
           id,
           [Op.and]: {
             start: {
-              [Op.le]: now
+              [Op.lte]: now
             },
             end: {
-              [Op.ge]: now
+              [Op.gte]: now
             }
           }
         }
