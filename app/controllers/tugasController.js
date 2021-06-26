@@ -178,7 +178,8 @@ module.exports = {
         },
         {
           model: User,
-          where: { kelompok: req.userToken.kelompok }
+          where: { kelompok: req.userToken.kelompok },
+          attributes: ['nim', 'kelompok']
         }]
       });
       res.json({submisi});
