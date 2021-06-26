@@ -1,5 +1,6 @@
 const formidable = require('formidable');
 const { DetailMentoring, Mentoring } = require('../database/models');
+const { unixSecondsToDate } = require('../helper/parseUnix');
 
 module.exports = {
   /**
@@ -13,8 +14,8 @@ module.exports = {
       if(err) res.status(400).json({message: 'error adding mentoring detail'});
       else{
         const { day, judul, deskripsi } = fields;
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         try{
           await DetailMentoring.create({
             day, judul, deskripsi, start, end
@@ -40,8 +41,8 @@ module.exports = {
       if(err) res.status(400).json({message: 'error editing mentoring detail'});
       else{
         const { day, judul, deskripsi } = fields;
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         try{
           const mentoring = await DetailMentoring.findOne({
             where: { id }
@@ -51,6 +52,7 @@ module.exports = {
           if(deskripsi) mentoring.deskripsi = deskripsi;
           if(start) mentoring.start = start;
           if(end) mentoring.end = end;
+          await mentoring.save();
         }
         catch(err){
           console.log(err);

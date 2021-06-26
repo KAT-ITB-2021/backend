@@ -21,7 +21,9 @@ module.exports = {
           bagian, judul, deskripsi, embed
         });
         if(files.file){
-          files.file.forEach(async (file, i) => {
+          let file = files.file;
+          if(!Array.isArray(files.file)) file = [file];
+          file.forEach(async (file, i) => {
             try{
               const pathInBucket = `${judul}_${i}`;
               await uploadFile(file.path, pathInBucket);
@@ -76,7 +78,7 @@ module.exports = {
         if(fields.embed){
           materi.link = fields.embed;
         }
-        materi.save();
+        await materi.save();
         res.json({message: 'Edit success'});
       }
     });
@@ -89,7 +91,11 @@ module.exports = {
    */
   async getAllMateri(_, res){
     const materis = await Materi.findAll({
-      attributes: ['id', 'bagian', 'judul']
+      attributes: ['id', 'bagian', 'judul', 'deskripsi'],
+      include: {
+        model: File,
+        attributes: ['name', 'path']
+      }
     });
     res.json({materis});
   },

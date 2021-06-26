@@ -1,5 +1,5 @@
 const formidable = require('formidable');
-const { Tugas, SubmisiTugas } = require('../database/models');
+const { Tugas, SubmisiTugas, User } = require('../database/models');
 const { uploadFile } = require('../helper/uploader');
 
 module.exports = {
@@ -169,13 +169,18 @@ module.exports = {
     try{
       const submisi = await SubmisiTugas.findAll({
         attributes: ['id', 'nama', 'pemilik', 'path'],
-        include: {
+        include: [{
           model: Tugas,
           where: { id },
           attributes: {
             exclude: ['createdAt', 'updatedAt']
           }
-        }
+        },
+        {
+          model: User,
+          where: { kelompok: req.userToken.kelompok },
+          attributes: ['nim', 'kelompok']
+        }]
       });
       res.json({submisi});
     }
@@ -192,15 +197,20 @@ module.exports = {
   async lihatSubmisiSendiri(req, res){
     const id = req.params.id;
     try{
-      const submisi = await SubmisiTugas.findAll({
+      const submisi = await SubmisiTugas.findOne({
         attributes: ['id', 'nama', 'pemilik', 'path'],
-        include: {
+        include: [{
           model: Tugas,
           where: { id },
           attributes: {
             exclude: ['createdAt', 'updatedAt']
           }
-        }
+        },
+        {
+          model: User,
+          where: { id: req.userToken.id },
+          attributes: []
+        }]
       });
       res.json(submisi);
     }

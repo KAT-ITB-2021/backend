@@ -1,5 +1,7 @@
 const formidable = require('formidable');
 const { JadwalPresensi, PresensiPeserta } = require('../database/models');
+const { unixSecondsToDate } = require('../helper/parseUnix');
+const { Op } = require('sequelize');
 
 module.exports = {
   /**
@@ -12,8 +14,8 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         const { judul } = fields;
         try{
           await JadwalPresensi.create({
@@ -56,8 +58,8 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start)) ?? false;
-        const end = new Date(parseInt(fields.end)) ?? false;
+        const start = unixSecondsToDate(fields.start) ?? false;
+        const end = unixSecondsToDate(fields.end) ?? false;
         const { judul } = fields;
         try{
           const jadwal = await JadwalPresensi.findOne({
@@ -119,25 +121,42 @@ module.exports = {
    */
   async daftarkanPresensi(req, res){
     const id = req.params.id;
+    const now = new Date();
     try{
-      const presensi = await PresensiPeserta.findOne({
+      const jadwal = await JadwalPresensi.findOne({
         where: {
-          user: req.userToken.id,
-          jadwal: id
+          id,
+          [Op.and]: {
+            start: {
+              [Op.le]: now
+            },
+            end: {
+              [Op.ge]: now
+            }
+          }
         }
       });
-      if(presensi){
-        presensi.hadir = true;
-        await presensi.save();
-      }
+      if(!jadwal) res.status(400).json({message: 'presensi not available'});
       else{
-        await PresensiPeserta.create({
-          user: req.userToken.id,
-          jadwal: id,
-          hadir: true
+        const presensi = await PresensiPeserta.findOne({
+          where: {
+            user: req.userToken.id,
+            jadwal: id
+          }
         });
+        if(presensi){
+          presensi.hadir = true;
+          await presensi.save();
+        }
+        else{
+          await PresensiPeserta.create({
+            user: req.userToken.id,
+            jadwal: id,
+            hadir: true
+          });
+        }
+        res.json({message: 'success registering presensi'});
       }
-      res.json({message: 'success registering presensi'});
     }
     catch(err){
       console.log(err);

@@ -44,7 +44,7 @@ module.exports = {
         const { detail, link, kelompok } = fields;
         try{
           const mentoring = await Mentoring.findOne({
-            id
+            where: { id }
           });
           if(detail) mentoring.detail = detail;
           if(link) mentoring.link = link;
@@ -121,9 +121,32 @@ module.exports = {
   async getAllMentoring(req, res){
     try{
       const mentoring = await Mentoring.findAll({
+        where: {
+          kelompok: req.userToken.kelompok
+        },
         include: {
           model: DetailMentoring,
-          attributes: ['judul']
+          attributes: ['judul', 'deskripsi', 'start', 'end'],
+        }
+      });
+      res.json({mentoring});
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'error fetching mentoring'});
+    }
+  },
+  /**
+   * Route to get all mentoring by admin
+   * returns object with one property, `mentoring`, which holds array of Mentoring:
+   * [{`id`, `kelompok`, `detail`, `link`}]
+   */
+  async getAllMentoringAdmin(req, res){
+    try{
+      const mentoring = await Mentoring.findAll({
+        include: {
+          model: DetailMentoring,
+          attributes: ['judul'],
         }
       });
       res.json({mentoring});

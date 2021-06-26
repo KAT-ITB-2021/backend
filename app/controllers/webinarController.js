@@ -1,6 +1,7 @@
 const formidable = require('formidable');
 const { Webinar } = require('../database/models');
 const { Op } = require('sequelize');
+const { unixSecondsToDate } = require('../helper/parseUnix');
 
 module.exports = {
   /**
@@ -13,8 +14,8 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         const { ytid, judul, deskripsi } = fields;
         try{
           await Webinar.create({
@@ -54,11 +55,11 @@ module.exports = {
     form.parse(req, async (err, fields) => {
       if(err) res.status(400).json({message: 'error parsing form'});
       else{
-        const start = new Date(parseInt(fields.start));
-        const end = new Date(parseInt(fields.end));
+        const start = unixSecondsToDate(fields.start);
+        const end = unixSecondsToDate(fields.end);
         const { ytid, judul, deskripsi } = fields;
         try{
-          const webinar = Webinar.findOne({
+          const webinar = await Webinar.findOne({
             where: { id }
           });
           if(start) webinar.start = start;
