@@ -21,7 +21,9 @@ module.exports = {
           bagian, judul, deskripsi, embed
         });
         if(files.file){
-          files.file.forEach(async (file, i) => {
+          let file = files.file;
+          if(!Array.isArray(files.file)) file = [file];
+          file.forEach(async (file, i) => {
             try{
               const pathInBucket = `${judul}_${i}`;
               await uploadFile(file.path, pathInBucket);
