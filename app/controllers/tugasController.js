@@ -196,7 +196,7 @@ module.exports = {
   async lihatSubmisiSendiri(req, res){
     const id = req.params.id;
     try{
-      const submisi = await SubmisiTugas.findAll({
+      const submisi = await SubmisiTugas.findOne({
         attributes: ['id', 'nama', 'pemilik', 'path'],
         include: [{
           model: Tugas,
