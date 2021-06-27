@@ -23,7 +23,7 @@ module.exports = {
         if(!Array.isArray(files.file)) file = [file];
         file.forEach(async (file, i) => {
           try{
-            const pathInBucket = `${judul}_${i}`;
+            const pathInBucket = `${judul}_${i}_${file.name}`;
             await uploadFile(file.path, pathInBucket);
             await File.create({
               name: file.name,
