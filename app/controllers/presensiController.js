@@ -1,7 +1,7 @@
-const formidable = require('formidable');
 const { JadwalPresensi, PresensiPeserta } = require('../database/models');
 const { unixSecondsToDate } = require('../helper/parseUnix');
 const { Op } = require('sequelize');
+const { parseForm } = require('../helper/parseform');
 
 module.exports = {
   /**
@@ -9,26 +9,26 @@ module.exports = {
    * three fields in form is needed:
    * `judul`, `start`, and `end`, both of which is formatted as seconds since UNIX epochs.
    */
-  addJadwal(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        const start = unixSecondsToDate(fields.start);
-        const end = unixSecondsToDate(fields.end);
-        const { judul } = fields;
-        try{
-          await JadwalPresensi.create({
-            judul, start, end
-          });
-          res.json({message: 'success add jadwal'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error when adding jadwal'});
-        }
+  async addJadwal(req, res){
+    try{
+      const { fields } = await parseForm(req);
+      const start = unixSecondsToDate(fields.start);
+      const end = unixSecondsToDate(fields.end);
+      const { judul } = fields;
+      try{
+        await JadwalPresensi.create({
+          judul, start, end
+        });
+        res.json({message: 'success add jadwal'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error when adding jadwal'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to remove JadwalPresensi by id
@@ -52,31 +52,31 @@ module.exports = {
    * three fields in form is needed:
    * `judul`, `start` and `end`, both of which is formatted as seconds since UNIX epochs.
    */
-  editJadwal(req, res){
+  async editJadwal(req, res){
     const id = req.params.id;
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        const start = unixSecondsToDate(fields.start) ?? false;
-        const end = unixSecondsToDate(fields.end) ?? false;
-        const { judul } = fields;
-        try{
-          const jadwal = await JadwalPresensi.findOne({
-            where: { id }
-          });
-          if(judul) jadwal.judul = judul;
-          if(start) jadwal.start = start;
-          if(end) jadwal.end = end;
-          await jadwal.save();
-          res.json({message: 'success edit jadwal'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error editing jadwal'});
-        }
+    try{
+      const { fields } = await parseForm(req);
+      const start = unixSecondsToDate(fields.start) ?? false;
+      const end = unixSecondsToDate(fields.end) ?? false;
+      const { judul } = fields;
+      try{
+        const jadwal = await JadwalPresensi.findOne({
+          where: { id }
+        });
+        if(judul) jadwal.judul = judul;
+        if(start) jadwal.start = start;
+        if(end) jadwal.end = end;
+        await jadwal.save();
+        res.json({message: 'success edit jadwal'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error editing jadwal'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to get all JadwalPresensi
@@ -221,31 +221,31 @@ module.exports = {
    * [{`id`, `hadir`, `jadwal`: {`id`, `judul`, `start`, `end`}}]
    */
   async listPresensiPesertaOther(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
+    try{
+      const { fields } = await parseForm(req);
+      if(!fields.userid) res.status(400).json({message: 'userid must not be empty'});
       else{
-        if(!fields.userid) res.status(400).json({message: 'userid must not be empty'});
-        else{
-          try{
-            const presensi = await PresensiPeserta.findAll({
-              where: {
-                user: fields.userid
-              },
-              include: {
-                model: JadwalPresensi,
-                attributes: ['id', 'judul', 'start', 'end']
-              },
-              attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
-            });
-            res.json(presensi);
-          }
-          catch(err){
-            console.log(err);
-            res.status(500).json({message: 'error when fetching presensi'});
-          }
+        try{
+          const presensi = await PresensiPeserta.findAll({
+            where: {
+              user: fields.userid
+            },
+            include: {
+              model: JadwalPresensi,
+              attributes: ['id', 'judul', 'start', 'end']
+            },
+            attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
+          });
+          res.json(presensi);
+        }
+        catch(err){
+          console.log(err);
+          res.status(500).json({message: 'error when fetching presensi'});
         }
       }
-    });
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   }
 };

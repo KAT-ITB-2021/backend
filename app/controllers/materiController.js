@@ -1,6 +1,6 @@
-const formidable = require('formidable');
 const { Materi, File } = require('../database/models');
 const { uploadFile } = require('../helper/uploader');
+const { parseForm } = require('../helper/parseform');
 
 module.exports = {
   /**
@@ -12,36 +12,36 @@ module.exports = {
    * Files are uploaded in `file` field.
    */
   async addMateri(req, res){
-    const form = formidable({multiples: true});
-    form.parse(req, async (err, fields, files) => {
-      if(err) res.status(400);
-      else{
-        const {bagian, judul, deskripsi, embed} = fields;
-        const materi = await Materi.create({
-          bagian, judul, deskripsi, embed
+    try{
+      const { fields, files } = await parseForm(req);
+      const {bagian, judul, deskripsi, embed} = fields;
+      const materi = await Materi.create({
+        bagian, judul, deskripsi, embed
+      });
+      if(files.file){
+        let file = files.file;
+        if(!Array.isArray(files.file)) file = [file];
+        file.forEach(async (file, i) => {
+          try{
+            const pathInBucket = `${judul}_${i}`;
+            await uploadFile(file.path, pathInBucket);
+            await File.create({
+              name: file.name,
+              path: pathInBucket,
+              materi: materi.id
+            });
+          }
+          catch(err){
+            console.log(err);
+            res.status(500).send({message: 'upload error'});
+          }
         });
-        if(files.file){
-          let file = files.file;
-          if(!Array.isArray(files.file)) file = [file];
-          file.forEach(async (file, i) => {
-            try{
-              const pathInBucket = `${judul}_${i}`;
-              await uploadFile(file.path, pathInBucket);
-              await File.create({
-                name: file.name,
-                path: pathInBucket,
-                materi: materi.id
-              });
-            }
-            catch(err){
-              console.log(err);
-              res.status(500).send({message: 'upload error'});
-            }
-          });
-        }
-        res.json({message: 'success upload'});
       }
-    });
+      res.json({message: 'success upload'});
+    }
+    catch(err){
+      res.status(400);
+    }
   },
   /**
    * Route to remove materi by id
@@ -60,28 +60,33 @@ module.exports = {
    * Files are not possible to delete
    */
   async editMateri(req, res){
-    const form = formidable({multiples: true});
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400);
-      else{
-        res.json(fields);
-        const materi = await Materi.findOne({ id: req.params.id });
-        if(fields.bagian){
-          materi.bagian = fields.bagian;
-        }
-        if(fields.judul){
-          materi.judul = fields.judul;
-        }
-        if(fields.deskripsi){
-          materi.deskripsi = fields.deskripsi;
-        }
-        if(fields.embed){
-          materi.embed = fields.embed;
-        }
+    try{
+      const {fields} = await parseForm(req);
+      res.json(fields);
+      const materi = await Materi.findOne({ id: req.params.id });
+      if(fields.bagian){
+        materi.bagian = fields.bagian;
+      }
+      if(fields.judul){
+        materi.judul = fields.judul;
+      }
+      if(fields.deskripsi){
+        materi.deskripsi = fields.deskripsi;
+      }
+      if(fields.embed){
+        materi.embed = fields.embed;
+      }
+      try{
         await materi.save();
         res.json({message: 'Edit success'});
       }
-    });
+      catch(err){
+        res.status(500).json({message: 'Edit fail'});
+      }
+    }
+    catch(err){
+      res.status(400);
+    }
   },
   /**
    * Route to get all materi

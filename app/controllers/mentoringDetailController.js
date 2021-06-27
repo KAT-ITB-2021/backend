@@ -1,5 +1,5 @@
-const formidable = require('formidable');
 const { DetailMentoring, Mentoring } = require('../database/models');
+const { parseForm } = require('../helper/parseform');
 const { unixSecondsToDate } = require('../helper/parseUnix');
 
 module.exports = {
@@ -8,58 +8,58 @@ module.exports = {
    * required fields: `day`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
-  addDetailMentoring(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error adding mentoring detail'});
-      else{
-        const { day, judul, deskripsi } = fields;
-        const start = unixSecondsToDate(fields.start);
-        const end = unixSecondsToDate(fields.end);
-        try{
-          await DetailMentoring.create({
-            day, judul, deskripsi, start, end
-          });
-          res.json({message: 'success adding mentoring detail'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error adding mentoring detail'});
-        }
+  async addDetailMentoring(req, res){
+    try{
+      const { fields } = await parseForm(req);
+      const { day, judul, deskripsi } = fields;
+      const start = unixSecondsToDate(fields.start);
+      const end = unixSecondsToDate(fields.end);
+      try{
+        await DetailMentoring.create({
+          day, judul, deskripsi, start, end
+        });
+        res.json({message: 'success adding mentoring detail'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error adding mentoring detail'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error adding mentoring detail'});
+    }
   },
   /**
    * Route to edit Mentoring Detail by id
    * optional fields: `day`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
-  editDetailMentoring(req, res){
+  async editDetailMentoring(req, res){
     const { id } = req.params;
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error editing mentoring detail'});
-      else{
-        const { day, judul, deskripsi } = fields;
-        const start = unixSecondsToDate(fields.start);
-        const end = unixSecondsToDate(fields.end);
-        try{
-          const mentoring = await DetailMentoring.findOne({
-            where: { id }
-          });
-          if(day) mentoring.day = day;
-          if(judul) mentoring.judul = judul;
-          if(deskripsi) mentoring.deskripsi = deskripsi;
-          if(start) mentoring.start = start;
-          if(end) mentoring.end = end;
-          await mentoring.save();
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error editing mentoring detail'});
-        }
+    try{
+      const { fields } = await parseForm(req);
+      const { day, judul, deskripsi } = fields;
+      const start = unixSecondsToDate(fields.start);
+      const end = unixSecondsToDate(fields.end);
+      try{
+        const mentoring = await DetailMentoring.findOne({
+          where: { id }
+        });
+        if(day) mentoring.day = day;
+        if(judul) mentoring.judul = judul;
+        if(deskripsi) mentoring.deskripsi = deskripsi;
+        if(start) mentoring.start = start;
+        if(end) mentoring.end = end;
+        await mentoring.save();
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error editing mentoring detail'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error editing mentoring detail'});
+    }
   },
   /**
    * Route to delete Mentoring Detail by id
