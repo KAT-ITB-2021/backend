@@ -76,7 +76,7 @@ module.exports = {
           materi.deskripsi = fields.deskripsi;
         }
         if(fields.embed){
-          materi.link = fields.embed;
+          materi.embed = fields.embed;
         }
         await materi.save();
         res.json({message: 'Edit success'});
