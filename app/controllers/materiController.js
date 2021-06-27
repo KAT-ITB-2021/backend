@@ -62,8 +62,7 @@ module.exports = {
   async editMateri(req, res){
     try{
       const {fields} = await parseForm(req);
-      res.json(fields);
-      const materi = await Materi.findOne({ id: req.params.id });
+      const materi = await Materi.findByPk(req.params.id);
       if(fields.bagian){
         materi.bagian = fields.bagian;
       }
