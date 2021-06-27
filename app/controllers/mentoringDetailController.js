@@ -51,6 +51,7 @@ module.exports = {
         if(start) mentoring.start = start;
         if(end) mentoring.end = end;
         await mentoring.save();
+        res.json({message: 'success editing mentoring detail'});
       }
       catch(err){
         console.log(err);

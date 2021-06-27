@@ -124,7 +124,7 @@ module.exports = {
     try{
       const { files } = await parseForm(req);
       try{
-        const bucketPath = `${req.userToken.id}_${id}`;
+        const bucketPath = `${req.userToken.id}_${id}_${files.file.path}`;
         await uploadFile(files.file.path, bucketPath);
         await SubmisiTugas.create({
           nama: files.file.name,
