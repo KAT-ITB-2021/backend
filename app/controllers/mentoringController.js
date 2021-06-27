@@ -1,6 +1,6 @@
-const formidable = require('formidable');
 const { Op } = require('sequelize');
 const { Mentoring, DetailMentoring } = require('../database/models');
+const { parseForm } = require('../helper/parseform');
 
 module.exports = {
   /**
@@ -9,24 +9,24 @@ module.exports = {
    * `detail`, `link`, `kelompok`
    * `detail` is id of Mentoring Detail associated
    */
-  addMentoring(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({ message: 'error parsing form' });
-      else{
-        const { detail, link, kelompok } = fields;
-        try{
-          await Mentoring.create({
-            detail, link, kelompok
-          });
-          res.json({message: 'success adding mentoring'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error adding mentoring'});
-        }
+  async addMentoring(req, res){
+    try{
+      const { fields } = await parseForm(req);
+      const { detail, link, kelompok } = fields;
+      try{
+        await Mentoring.create({
+          detail, link, kelompok
+        });
+        res.json({message: 'success adding mentoring'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error adding mentoring'});
+      }
+    }
+    catch(err){
+      res.status(400).json({ message: 'error parsing form' });
+    }
   },
   /**
    * Route to edit mentoring
@@ -35,29 +35,29 @@ module.exports = {
    * `detail` is id of Mentoring Detail associated
    * both are optional
    */
-  editMentoring(req, res){
-    const form = formidable();
-    const id = req.params.id;
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({ message: 'error parsing form' });
-      else{
-        const { detail, link, kelompok } = fields;
-        try{
-          const mentoring = await Mentoring.findOne({
-            where: { id }
-          });
-          if(detail) mentoring.detail = detail;
-          if(link) mentoring.link = link;
-          if(kelompok) mentoring.kelompok = kelompok;
-          await mentoring.save();
-          res.json({message: 'success editing mentoring'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error editing mentoring'});
-        }
+  async editMentoring(req, res){
+    const { id } = req.params;
+    try{
+      const { fields } = await parseForm(req);
+      const { detail, link, kelompok } = fields;
+      try{
+        const mentoring = await Mentoring.findOne({
+          where: { id }
+        });
+        if(detail) mentoring.detail = detail;
+        if(link) mentoring.link = link;
+        if(kelompok) mentoring.kelompok = kelompok;
+        await mentoring.save();
+        res.json({message: 'success editing mentoring'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error editing mentoring'});
+      }
+    }
+    catch(err){
+      res.status(400).json({ message: 'error parsing form' });
+    }
   },
   /**
    * Route to remove Mentoring by id

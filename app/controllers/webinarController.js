@@ -1,7 +1,7 @@
-const formidable = require('formidable');
 const { Webinar } = require('../database/models');
 const { Op } = require('sequelize');
 const { unixSecondsToDate } = require('../helper/parseUnix');
+const { parseForm } = require('../helper/parseform');
 
 module.exports = {
   /**
@@ -9,26 +9,26 @@ module.exports = {
    * form fields: `ytid`, `judul`, `deskripsi`, `start`, `end`
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
-  addWebinar(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        const start = unixSecondsToDate(fields.start);
-        const end = unixSecondsToDate(fields.end);
-        const { ytid, judul, deskripsi } = fields;
-        try{
-          await Webinar.create({
-            start, end, ytid, judul, deskripsi
-          });
-          res.json({message: 'success adding webinar'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error adding webinar'});
-        }
+  async addWebinar(req, res){
+    try{
+      const { fields } = await parseForm(req);
+      const start = unixSecondsToDate(fields.start);
+      const end = unixSecondsToDate(fields.end);
+      const { ytid, judul, deskripsi } = fields;
+      try{
+        await Webinar.create({
+          start, end, ytid, judul, deskripsi
+        });
+        res.json({message: 'success adding webinar'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error adding webinar'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to remove Webinar by Id
@@ -49,33 +49,33 @@ module.exports = {
    * form fields: `ytid`, `judul`, `deskripsi`, `start`, `end`
    * all fields optional
    */
-  editWebinar(req, res){
+  async editWebinar(req, res){
     const id = req.params.id;
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        const start = unixSecondsToDate(fields.start);
-        const end = unixSecondsToDate(fields.end);
-        const { ytid, judul, deskripsi } = fields;
-        try{
-          const webinar = await Webinar.findOne({
-            where: { id }
-          });
-          if(start) webinar.start = start;
-          if(end) webinar.end = end;
-          if(ytid) webinar.ytid = ytid;
-          if(judul) webinar.judul = judul;
-          if(deskripsi) webinar.deskripsi = deskripsi;
-          await webinar.save();
-          res.json({message: 'success editing webinar'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error editing webinar'});
-        }
+    try{
+      const { fields } = await parseForm(req);
+      const start = unixSecondsToDate(fields.start);
+      const end = unixSecondsToDate(fields.end);
+      const { ytid, judul, deskripsi } = fields;
+      try{
+        const webinar = await Webinar.findOne({
+          where: { id }
+        });
+        if(start) webinar.start = start;
+        if(end) webinar.end = end;
+        if(ytid) webinar.ytid = ytid;
+        if(judul) webinar.judul = judul;
+        if(deskripsi) webinar.deskripsi = deskripsi;
+        await webinar.save();
+        res.json({message: 'success editing webinar'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error editing webinar'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to list all webinars

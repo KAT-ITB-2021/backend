@@ -1,5 +1,5 @@
-const formidable = require('formidable');
 const { Tugas, SubmisiTugas, User } = require('../database/models');
+const { parseForm } = require('../helper/parseform');
 const { uploadFile } = require('../helper/uploader');
 
 module.exports = {
@@ -48,25 +48,25 @@ module.exports = {
    * There are 3 fields that needs to be filled:
    * `bagian`, `judul`, `deskripsi`.
    */
-  addTugas(req, res){
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        const {bagian, judul, deskripsi} = fields;
-        if(!bagian || !judul || !deskripsi) res.status(401).json({message: 'empty field not allowed'});
-        try{
-          await Tugas.create({
-            bagian, judul, deskripsi
-          });
-          res.json({message: 'success creating tugas'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error when creating tugas'});
-        }
+  async addTugas(req, res){
+    try{
+      const { fields } = await parseForm(req);
+      const {bagian, judul, deskripsi} = fields;
+      if(!bagian || !judul || !deskripsi) res.status(401).json({message: 'empty field not allowed'});
+      try{
+        await Tugas.create({
+          bagian, judul, deskripsi
+        });
+        res.json({message: 'success creating tugas'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error when creating tugas'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to remove Tugas by Id
@@ -92,26 +92,26 @@ module.exports = {
    */
   async editTugas(req, res){
     const id = req.params.id;
-    const form = formidable();
-    form.parse(req, async (err, fields) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        try{
-          const tugas = await Tugas.findOne({
-            where: { id }
-          });
-          if(fields.bagian) tugas.bagian = fields.bagian;
-          if(fields.judul) tugas.judul = fields.judul;
-          if(fields.deskripsi) tugas.deskripsi = fields.deskripsi;
-          await tugas.save();
-          res.json({message: 'success editing tugas'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error editing tugas'});
-        }
+    try{
+      const { fields } = await parseForm(req);
+      try{
+        const tugas = await Tugas.findOne({
+          where: { id }
+        });
+        if(fields.bagian) tugas.bagian = fields.bagian;
+        if(fields.judul) tugas.judul = fields.judul;
+        if(fields.deskripsi) tugas.deskripsi = fields.deskripsi;
+        await tugas.save();
+        res.json({message: 'success editing tugas'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error editing tugas'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to add SubmisiTugas
@@ -121,27 +121,27 @@ module.exports = {
    */
   async submitTugas(req, res){
     const id = parseInt(req.params.id);
-    const form = formidable();
-    form.parse(req, async(err, fields, files) => {
-      if(err) res.status(400).json({message: 'error parsing form'});
-      else{
-        try{
-          const bucketPath = `${req.userToken.id}_${id}`;
-          await uploadFile(files.file.path, bucketPath);
-          await SubmisiTugas.create({
-            nama: files.file.name,
-            path: bucketPath,
-            pemilik: req.userToken.id,
-            tugas: id
-          });
-          res.json({message: 'success submitting tugas'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'error submitting tugas'});
-        }
+    try{
+      const { files } = await parseForm(req);
+      try{
+        const bucketPath = `${req.userToken.id}_${id}`;
+        await uploadFile(files.file.path, bucketPath);
+        await SubmisiTugas.create({
+          nama: files.file.name,
+          path: bucketPath,
+          pemilik: req.userToken.id,
+          tugas: id
+        });
+        res.json({message: 'success submitting tugas'});
       }
-    });
+      catch(err){
+        console.log(err);
+        res.status(500).json({message: 'error submitting tugas'});
+      }
+    }
+    catch(err){
+      res.status(400).json({message: 'error parsing form'});
+    }
   },
   /**
    * Route to remove SubmisiTugas
