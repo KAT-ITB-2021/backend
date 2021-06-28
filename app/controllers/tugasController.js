@@ -1,4 +1,5 @@
 const { Tugas, SubmisiTugas, User } = require('../database/models');
+const { ROLES } = require('../helper/constants');
 const { parseForm } = require('../helper/parseform');
 const { uploadFile } = require('../helper/uploader');
 
@@ -166,6 +167,7 @@ module.exports = {
    */
   async listSubmisiPerTugas(req, res){
     const id = parseInt(req.params.id);
+    const kelompokFilter = req.userToken.role === ROLES.mentor ? { kelompok: req.userToken.kelompok } : {};
     try{
       const submisi = await SubmisiTugas.findAll({
         attributes: ['id', 'nama', 'pemilik', 'path'],
@@ -178,7 +180,7 @@ module.exports = {
         },
         {
           model: User,
-          where: { kelompok: req.userToken.kelompok },
+          where: kelompokFilter,
           attributes: ['nim', 'kelompok']
         }]
       });
