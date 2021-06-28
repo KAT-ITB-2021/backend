@@ -42,7 +42,7 @@ module.exports = {
    * Middleware untuk otentikasi role dengan kuasa melihat submisi tugas ('mentor')
    */
   authMentor(req, res, next){
-    if(req.userToken.role === ROLES.mentor) next();
+    if(req.userToken.role === ROLES.mentor || req.userToken.role === ROLES.admin) next();
     else res.status(403).send();
   }
 };
