@@ -21,34 +21,28 @@ module.exports = {
       if(files.file){
         let file = files.file;
         if(!Array.isArray(files.file)) file = [file];
-        try{
-          await Promise.all(file.map((file, i) => new Promise((resolve, reject) => {
-            const pathInBucket = `${judul}_${i}_${file.name}`;
-            uploadFile(file.path, pathInBucket).then(() => {
-              File.create({
-                name: file.name,
-                path: pathInBucket,
-                materi: materi.id
-              }).then(() => {
-                resolve();
-              });
-            }).catch((err) => {
-              reject(err);
+        await Promise.all(file.map((file, i) => new Promise((resolve, reject) => {
+          const pathInBucket = `${judul}_${i}_${file.name}`;
+          uploadFile(file.path, pathInBucket).then(() => {
+            File.create({
+              name: file.name,
+              path: pathInBucket,
+              materi: materi.id
+            }).then(() => {
+              resolve();
             });
-          })));
-          res.json({message: 'success upload'});
-        }
-        catch(err){
-          console.log(err);
-          res.status(500).json({message: 'failed adding materi'});
-        }
+          }).catch((err) => {
+            reject(err);
+          });
+        })));
+        res.json({message: 'success upload'});
       }
       else{
         res.json({message: 'success upload'});
       }
     }
     catch(err){
-      res.status(400);
+      res.status(400).json({message: 'unknown error occured'});
     }
   },
   /**
