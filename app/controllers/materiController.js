@@ -29,6 +29,7 @@ module.exports = {
               path: pathInBucket,
               materi: materi.id
             }).then(() => {
+              console.log('success');
               resolve();
             });
           }).catch((err) => {
