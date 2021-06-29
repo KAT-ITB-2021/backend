@@ -21,23 +21,31 @@ module.exports = {
       if(files.file){
         let file = files.file;
         if(!Array.isArray(files.file)) file = [file];
-        file.forEach(async (file, i) => {
-          try{
+        try{
+          await Promise.all(file.map((file, i) => new Promise((resolve, reject) => {
             const pathInBucket = `${judul}_${i}_${file.name}`;
-            await uploadFile(file.path, pathInBucket);
-            await File.create({
-              name: file.name,
-              path: pathInBucket,
-              materi: materi.id
+            uploadFile(file.path, pathInBucket).then(() => {
+              File.create({
+                name: file.name,
+                path: pathInBucket,
+                materi: materi.id
+              }).then(() => {
+                resolve();
+              });
+            }).catch((err) => {
+              reject(err);
             });
-          }
-          catch(err){
-            console.log(err);
-            res.status(500).send({message: 'upload error'});
-          }
-        });
+          })));
+          res.json({message: 'success upload'});
+        }
+        catch(err){
+          console.log(err);
+          res.status(500).json({message: 'failed adding materi'});
+        }
       }
-      res.json({message: 'success upload'});
+      else{
+        res.json({message: 'success upload'});
+      }
     }
     catch(err){
       res.status(400);
