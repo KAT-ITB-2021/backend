@@ -151,7 +151,7 @@ module.exports = {
     const id = req.params.id;
     try{
       await SubmisiTugas.destroy({
-        where: { id }
+        where: { tugas: id, pemilik: req.userToken.id }
       });
       res.json({message: 'success removing submisi'});
     }
