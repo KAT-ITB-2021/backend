@@ -1,3 +1,4 @@
+const fs = require('fs');
 // Imports the Google Cloud client library
 const {Storage} = require('@google-cloud/storage');
 const {bucketName} = require('../config');
@@ -15,6 +16,8 @@ async function uploadFile(localFile, destination) {
   await storage.bucket(bucketName).upload(localFile, {
     destination: destination,
   });
+
+  fs.unlinkSync(localFile);
 
   console.log(`${localFile} uploaded to ${bucketName}`);
 }
