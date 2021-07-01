@@ -85,7 +85,10 @@ module.exports = {
     try{
       const mentoring = await Mentoring.findOne({
         where: {
-          kelompok: req.userToken.kelompok
+          [Op.or]: [
+            { kelompok: req.userToken.kelompok },
+            { kelompok: 0 }
+          ]
         },
         order: [['jadwal', 'DESC']],
         attributes: {
