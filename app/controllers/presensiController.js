@@ -168,11 +168,25 @@ module.exports = {
    */
   async hapuskanPresensi(req, res){
     const id = req.params.id;
+    const now = new Date();
     try{
       const presensi = await PresensiPeserta.findOne({
         where: {
           user: req.userToken.id,
-          jadwal: id
+          jadwal: id,
+        },
+        include: {
+          model: JadwalPresensi,
+          where: {
+            [Op.and]: {
+              start: {
+                [Op.lte]: now
+              },
+              end: {
+                [Op.gte]: now
+              }
+            }
+          }
         }
       });
       if(presensi){
