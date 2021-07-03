@@ -1,7 +1,7 @@
 const { Tugas, SubmisiTugas, User } = require('../database/models');
 const { ROLES } = require('../helper/constants');
 const { parseForm } = require('../helper/parseform');
-const { uploadFile } = require('../helper/uploader');
+const { uploadFile, deleteFile } = require('../helper/uploader');
 
 module.exports = {
   /**
@@ -150,9 +150,13 @@ module.exports = {
   async hapusSubmisi(req, res){
     const id = req.params.id;
     try{
+      const submisi = SubmisiTugas.findOne({
+        where: { id, pemilik: req.userToken.id }
+      });
       await SubmisiTugas.destroy({
         where: { id, pemilik: req.userToken.id }
       });
+      await deleteFile(submisi.path);
       res.json({message: 'success removing submisi'});
     }
     catch(err){
