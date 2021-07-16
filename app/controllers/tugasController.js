@@ -1,6 +1,7 @@
 const { Tugas, SubmisiTugas, User } = require('../database/models');
 const { ROLES } = require('../helper/constants');
 const { parseForm } = require('../helper/parseform');
+const { unixSecondsToDate } = require('../helper/parseUnix');
 const { uploadFile, deleteFile } = require('../helper/uploader');
 
 module.exports = {
@@ -25,7 +26,7 @@ module.exports = {
   /**
    * Route to get specific Tugas of id `id`
    * return object of tugas
-   * {`id`, `bagian`, `judul`, `deskripsi`}
+   * {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}
    */
   async getTugasById(req, res){
     const id = req.params.id;
@@ -46,17 +47,19 @@ module.exports = {
   /**
    * Route to add Tugas
    * Everything is passed using multipart/form-data
-   * There are 3 fields that needs to be filled:
-   * `bagian`, `judul`, `deskripsi`.
+   * There are 4 fields that needs to be filled:
+   * `bagian`, `judul`, `deskripsi`, `deadline`.
+   * `deadline` must be formatted as unix epoch (seconds)
    */
   async addTugas(req, res){
     try{
       const { fields } = await parseForm(req);
-      const {bagian, judul, deskripsi} = fields;
-      if(!bagian || !judul || !deskripsi) res.status(401).json({message: 'empty field not allowed'});
+      const {bagian, judul, deskripsi, deadline} = fields;
+      if(!bagian || !judul || !deskripsi || !deadline) res.status(401).json({message: 'empty field not allowed'});
+      const deadlineDate = unixSecondsToDate(deadline);
       try{
         await Tugas.create({
-          bagian, judul, deskripsi
+          bagian, judul, deskripsi, deadline: deadlineDate
         });
         res.json({message: 'success creating tugas'});
       }
@@ -88,8 +91,9 @@ module.exports = {
   /**
    * Route to edit tugas by Id
    * just like addTugas, everything is passed using multipart/form-data
-   * and there are 3 fields that could be filled:
-   * `bagian`, `judul`, `deskripsi`. Each field is optional, empty if not needed to update
+   * and there are 4 fields that could be filled:
+   * `bagian`, `judul`, `deskripsi`, `deadline`. Each field is optional, empty if not needed to update
+   * `deadline` must be formatted as unix epoch (seconds)
    */
   async editTugas(req, res){
     const id = req.params.id;
@@ -102,6 +106,7 @@ module.exports = {
         if(fields.bagian) tugas.bagian = fields.bagian;
         if(fields.judul) tugas.judul = fields.judul;
         if(fields.deskripsi) tugas.deskripsi = fields.deskripsi;
+        if(fields.deadline) tugas.deadline = unixSecondsToDate(fields.deadline);
         await tugas.save();
         res.json({message: 'success editing tugas'});
       }
@@ -167,7 +172,7 @@ module.exports = {
    * Route to list all SubmisiTugas by Id Tugas
    * returns an object with one property: `submisi`
    * which is an array of SubmisiTugas:
-   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`}}
+   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}}
    */
   async listSubmisiPerTugas(req, res){
     const id = parseInt(req.params.id);
@@ -198,7 +203,7 @@ module.exports = {
   /**
    * Route to get own SubmisiTugas on Tugas
    * returns SubmisiTugas:
-   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`}}
+   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}}
    */
   async lihatSubmisiSendiri(req, res){
     const id = req.params.id;
