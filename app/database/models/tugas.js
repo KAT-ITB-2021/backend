@@ -16,7 +16,8 @@ module.exports = (sequelize, DataTypes) => {
   Tugas.init({
     bagian: DataTypes.STRING,
     judul: DataTypes.STRING,
-    deskripsi: DataTypes.STRING
+    deskripsi: DataTypes.STRING,
+    deadline: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'Tugas',
