@@ -1,5 +1,5 @@
 const { Materi, File } = require('../database/models');
-const { uploadFile } = require('../helper/uploader');
+const { uploadFile, deleteFile } = require('../helper/uploader');
 const { parseForm } = require('../helper/parseform');
 
 module.exports = {
@@ -51,9 +51,17 @@ module.exports = {
    */
   async removeMateri(req, res){
     const id = req.params.id;
+    const materi = await Materi.findByPk(id, {
+      include: {
+        model: File
+      }
+    });
     await Materi.destroy({
       where: { id }
     });
+    await Promise.all(materi.File.map((file) => new Promise((resolve, reject) => {
+      deleteFile(file.path).then(resolve).catch(reject);
+    })));
     res.status(200).json({message: 'success'});
   },
   /**

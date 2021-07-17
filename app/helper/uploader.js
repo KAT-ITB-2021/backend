@@ -22,4 +22,10 @@ async function uploadFile(localFile, destination) {
   console.log(`${localFile} uploaded to ${bucketName}`);
 }
 
-module.exports = { uploadFile };
+async function deleteFile(fileName){
+  await storage.bucket(bucketName).file(fileName).delete();
+
+  console.log(`gs://${bucketName}/${fileName} deleted`);
+}
+
+module.exports = { uploadFile, deleteFile };
