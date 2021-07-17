@@ -56,16 +56,18 @@ module.exports = {
       const { fields } = await parseForm(req);
       const {bagian, judul, deskripsi, deadline} = fields;
       if(!bagian || !judul || !deskripsi || !deadline) res.status(401).json({message: 'empty field not allowed'});
-      const deadlineDate = unixSecondsToDate(deadline);
-      try{
-        await Tugas.create({
-          bagian, judul, deskripsi, deadline: deadlineDate
-        });
-        res.json({message: 'success creating tugas'});
-      }
-      catch(err){
-        console.log(err);
-        res.status(500).json({message: 'error when creating tugas'});
+      else{
+        const deadlineDate = unixSecondsToDate(deadline);
+        try{
+          await Tugas.create({
+            bagian, judul, deskripsi, deadline: deadlineDate
+          });
+          res.json({message: 'success creating tugas'});
+        }
+        catch(err){
+          console.log(err);
+          res.status(500).json({message: 'error when creating tugas'});
+        }
       }
     }
     catch(err){
