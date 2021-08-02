@@ -181,7 +181,7 @@ module.exports = {
     const kelompokFilter = req.userToken.role === ROLES.mentor ? { kelompok: req.userToken.kelompok } : {};
     try{
       const submisi = await SubmisiTugas.findAll({
-        attributes: ['id', 'nama', 'pemilik', 'path'],
+        attributes: ['id', 'nama', 'pemilik', 'path', 'updatedAt'],
         include: [{
           model: Tugas,
           where: { id },
@@ -211,7 +211,7 @@ module.exports = {
     const id = req.params.id;
     try{
       const submisi = await SubmisiTugas.findOne({
-        attributes: ['id', 'nama', 'pemilik', 'path'],
+        attributes: ['id', 'nama', 'pemilik', 'path', 'updatedAt'],
         include: [{
           model: Tugas,
           where: { id },
