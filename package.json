@@ -10,10 +10,11 @@
     "posttest": "NODE_ENV=test yarn sequelize db:migrate:undo:all",
     "lint": "yarn eslint app/",
     "start": "node app/index.js",
-    "watch": "yarn migrate && yarn nodemon"
+    "watch": "yarn nodemon"
   },
   "dependencies": {
     "@google-cloud/storage": "^5.8.5",
+    "@prisma/client": "2.28.0",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -27,6 +28,7 @@
     "eslint": "^7.27.0",
     "jest": "^27.0.3",
     "nodemon": "^2.0.7",
+    "prisma": "2.28.0",
     "supertest": "^6.1.3"
   }
 }

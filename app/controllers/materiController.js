@@ -1,4 +1,5 @@
 const { Materi, File } = require('../database/models');
+const { prisma } = require('../helper/prisma');
 const { uploadFile, deleteFile } = require('../helper/uploader');
 const { parseForm } = require('../helper/parseform');
 
@@ -15,7 +16,7 @@ module.exports = {
     try{
       const { fields, files } = await parseForm(req);
       const {bagian, judul, deskripsi, embed} = fields;
-      const materi = await Materi.create({
+      const materi = await prisma.materi.create({
         bagian, judul, deskripsi, embed
       });
       if(files.file){
@@ -24,7 +25,7 @@ module.exports = {
         await Promise.all(file.map((file, i) => new Promise((resolve, reject) => {
           const pathInBucket = `${judul}_${i}_${file.name}`;
           uploadFile(file.path, pathInBucket).then(() => {
-            File.create({
+            prisma.file.create({
               name: file.name,
               path: pathInBucket,
               materi: materi.id
@@ -51,7 +52,7 @@ module.exports = {
    */
   async removeMateri(req, res){
     const id = req.params.id;
-    const materi = await Materi.findByPk(id, {
+    const materi = await prisma.materi.findByPk(id, {
       include: {
         model: File
       }
@@ -59,7 +60,7 @@ module.exports = {
     await Materi.destroy({
       where: { id }
     });
-    await Promise.all(materi.File.map((file) => new Promise((resolve, reject) => {
+    await Promise.all(materi.file.map((file) => new Promise((resolve, reject) => {
       deleteFile(file.path).then(resolve).catch(reject);
     })));
     res.status(200).json({message: 'success'});
