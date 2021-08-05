@@ -4,6 +4,7 @@
   "private": true,
   "main": "app/index.js",
   "scripts": {
+    "prisma": "pnpify prisma",
     "migrate": "yarn sequelize db:migrate",
     "pretest": "NODE_ENV=test yarn sequelize db:migrate",
     "test": "yarn pretest && yarn jest && yarn posttest",
@@ -15,6 +16,7 @@
   "dependencies": {
     "@google-cloud/storage": "^5.8.5",
     "@prisma/client": "2.28.0",
+    "@yarnpkg/pnpify": "^3.0.0-rc.14",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
