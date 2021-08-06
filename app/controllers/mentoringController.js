@@ -1,6 +1,5 @@
-const { Op } = require('sequelize');
-const { Mentoring, DetailMentoring } = require('../database/models');
 const { parseForm } = require('../helper/parseform');
+const prisma = require('../helper/prisma');
 
 module.exports = {
   /**
@@ -13,21 +12,25 @@ module.exports = {
     try{
       const { fields } = await parseForm(req);
       const { detail, link, kelompok } = fields;
+
       try{
-        await Mentoring.create({
-          detail, link, kelompok
+        await prisma.mentoring.create({
+          data: {
+            detail,
+            link,
+            kelompok
+          },
         });
-        res.json({message: 'success adding mentoring'});
-      }
-      catch(err){
+        res.json({ message: 'success adding mentoring' });
+      } catch(err) {
         console.log(err);
         res.status(500).json({message: 'error adding mentoring'});
       }
-    }
-    catch(err){
+    } catch(err) {
       res.status(400).json({ message: 'error parsing form' });
     }
   },
+
   /**
    * Route to edit mentoring
    * form encoded fields:
@@ -36,36 +39,44 @@ module.exports = {
    * both are optional
    */
   async editMentoring(req, res){
-    const { id } = req.params;
+    if (!parseInt(req.params.id)) {
+      res.status(400).json({ message: 'error parsing form' });
+    }
+    const id = parseInt(req.params.id);
     try{
       const { fields } = await parseForm(req);
       const { detail, link, kelompok } = fields;
-      try{
-        const mentoring = await Mentoring.findOne({
-          where: { id }
+      try {
+
+        await prisma.mentoring.update({
+          where: { id },
+          data: {
+            detail: detail ?? undefined,
+            link: link ?? undefined,
+            kelompok: kelompok ?? undefined,
+          },
         });
-        if(detail) mentoring.detail = detail;
-        if(link) mentoring.link = link;
-        if(kelompok) mentoring.kelompok = kelompok;
-        await mentoring.save();
         res.json({message: 'success editing mentoring'});
-      }
-      catch(err){
+      } catch(err) {
         console.log(err);
         res.status(500).json({message: 'error editing mentoring'});
       }
-    }
-    catch(err){
+    } catch(err) {
       res.status(400).json({ message: 'error parsing form' });
     }
   },
+
   /**
    * Route to remove Mentoring by id
    */
   async removeMentoring(req, res) {
-    const id = req.params.id;
+    if (!parseInt(req.params.id)) {
+      res.status(400).json({ message: 'error parsing form' });
+    }
+    const id = parseInt(req.params.id);
+
     try{
-      await Mentoring.destroy({
+      await prisma.mentoring.delete({
         where: { id }
       });
       res.json({message: 'success removing mentoring'});
@@ -75,6 +86,7 @@ module.exports = {
       res.status(500).json({message: 'error removing mentoring'});
     }
   },
+
   /**
    * Route to get latest active Mentoring based on Kelompok
    * returns Mentoring object:
@@ -83,30 +95,34 @@ module.exports = {
   async getLatestMentoring(req, res) {
     const current = new Date();
     try{
-      const mentoring = await Mentoring.findOne({
+      const mentoring = await prisma.mentoring.findFirst({
         where: {
           kelompok: {
-            [Op.in]: [req.userToken.kelompok, 0]
-          }
-        },
-        order: [['jadwal', 'DESC']],
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        },
-        include: {
-          model: DetailMentoring,
-          attributes: {
-            exclude: ['createdAt', 'updatedAt']
+            in: [req.userToken.kelompok.toString(), '0'],
           },
-          where: {
-            [Op.and]: [
-              {
-                start: { [Op.le]: current },
-                end: { [Op.ge]: current}
-              }
-            ]
+          DetailMentoring: {
+            AND: {
+              start: { lte: current, },
+              end: { gte: current, },
+            }
           }
-        }
+        },
+        select: {
+          id: true,
+          DetailMentoring: {
+            select: {
+              id: true,
+              day: true,
+              judul: true,
+              deskripsi: true,
+              start: true,
+              end: true,
+            },
+          },
+          detail: true,
+          kelompok: true,
+          link: true,
+        },
       });
       res.json(mentoring);
     }
@@ -115,6 +131,7 @@ module.exports = {
       res.status(500).json({message: 'error fetching mentoring'});
     }
   }
+
   /**
    * Route to get all mentoring
    * returns object with one property, `mentoring`, which holds array of Mentoring:
@@ -122,24 +139,31 @@ module.exports = {
    */,
   async getAllMentoring(req, res){
     try{
-      const mentoring = await Mentoring.findAll({
+      const mentoring = await prisma.mentoring.findMany({
         where: {
           kelompok: {
-            [Op.in]: [req.userToken.kelompok, 0]
-          }
+            in: [req.userToken.kelompok.toString(), '0'],
+          },
         },
         include: {
-          model: DetailMentoring,
-          attributes: ['judul', 'deskripsi', 'start', 'end'],
-        }
+          DetailMentoring: {
+            select: {
+              judul: true,
+              deskripsi: true,
+              start: true,
+              end: true,
+            },
+          },
+        },
       });
-      res.json({mentoring});
+      res.json(mentoring);
     }
     catch(err){
       console.log(err);
       res.status(500).json({message: 'error fetching mentoring'});
     }
   },
+
   /**
    * Route to get all mentoring by admin
    * returns object with one property, `mentoring`, which holds array of Mentoring:
@@ -147,28 +171,36 @@ module.exports = {
    */
   async getAllMentoringAdmin(req, res){
     try{
-      const mentoring = await Mentoring.findAll({
+      const mentoring = await prisma.mentoring.findMany({
         include: {
-          model: DetailMentoring,
-          attributes: ['judul'],
-        }
+          DetailMentoring: {
+            select: {
+              judul: true,
+            },
+          },
+        },
       });
-      res.json({mentoring});
+      res.json(mentoring);
     }
     catch(err){
       console.log(err);
       res.status(500).json({message: 'error fetching mentoring'});
     }
   },
+
   /**
    * Route to get one mentoring
    * returns Mentoring object:
    * {`id`, kelompok`, `link`, `detail`}
    */
   async getOneMentoring(req, res){
-    const id = req.params.id;
+    if (!parseInt(req.params.id)) {
+      res.status(400).json({ message: 'error parsing form' });
+    }
+    const id = parseInt(req.params.id);
+
     try{
-      const mentoring = await Mentoring.findOne({where: {id}});
+      const mentoring = await prisma.mentoring.findUnique({ where: { id } });
       res.json(mentoring);
     }
     catch(err){

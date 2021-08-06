@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../.prisma"
 }
 
 datasource db {
@@ -14,11 +15,9 @@ model DetailMentoring {
   deskripsi  String?      @db.VarChar(255)
   start      DateTime?    @db.DateTime(0)
   end        DateTime?    @db.DateTime(0)
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  Mentorings Mentoring[]
-
-  @@map("DetailMentorings")
+  createdAt  DateTime     @db.DateTime(0) @default(now())
+  updatedAt  DateTime     @db.DateTime(0) @updatedAt
+  Mentoring  Mentoring[]
 }
 
 model File {
@@ -26,9 +25,9 @@ model File {
   materi    Int?
   name      String?  @db.VarChar(255)
   path      String?  @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Materis   Materi?  @relation(fields: [materi], references: [id])
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  Materi    Materi? @relation(fields: [materi], references: [id])
 
   @@index([materi], name: "materi")
   @@map("Files")
@@ -39,8 +38,8 @@ model JadwalPresensi {
   judul           String?           @db.VarChar(255)
   start           DateTime?         @db.DateTime(0)
   end             DateTime?         @db.DateTime(0)
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  createdAt       DateTime          @db.DateTime(0) @default(now())
+  updatedAt       DateTime          @db.DateTime(0) @updatedAt
   PresensiPeserta PresensiPeserta[]
 
   @@map("JadwalPresensis")
@@ -52,11 +51,9 @@ model Materi {
   judul     String?  @db.VarChar(255)
   deskripsi String?  @db.Text
   embed     String?  @db.VarChar(255)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  Files     File[]
-
-  @@map("Materis")
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  File      File[]
 }
 
 model Mentoring {
@@ -64,9 +61,9 @@ model Mentoring {
   kelompok         String?           @db.VarChar(255)
   link             String?           @db.VarChar(255)
   detail           Int?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  DetailMentorings DetailMentoring?  @relation(fields: [detail], references: [id])
+  createdAt        DateTime          @db.DateTime(0) @default(now())
+  updatedAt        DateTime          @db.DateTime(0) @updatedAt
+  DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id])
 
   @@index([detail], name: "detail")
   @@map("Mentorings")
