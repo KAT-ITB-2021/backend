@@ -16,8 +16,6 @@ module.exports = {
         return res.status(400).json({ message: 'No name or nim provided'});
       const salt = crypto.randomBytes(32);
 
-      const now = new Date();
-
       crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', async (_, derivedKey) => {
         try {
           const newUser = await prisma.users.create({
@@ -29,8 +27,6 @@ module.exports = {
               hashedPassword: derivedKey.toString('hex'),
               salt: salt.toString('hex'),
               role: CURRENT_ROLE,
-              createdAt: now,
-              updatedAt: now,
             }
           });
           res.status(200).send({
