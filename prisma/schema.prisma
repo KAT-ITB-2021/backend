@@ -7,61 +7,69 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DetailMentorings {
+model DetailMentoring {
   id         Int          @id @default(autoincrement())
   day        Int?
   judul      String?      @db.VarChar(255)
   deskripsi  String?      @db.VarChar(255)
   start      DateTime?    @db.DateTime(0)
   end        DateTime?    @db.DateTime(0)
-  createdAt  DateTime     @db.DateTime(0)
-  updatedAt  DateTime     @db.DateTime(0)
-  Mentorings Mentorings[]
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  Mentorings Mentoring[]
+
+  @@map("DetailMentorings")
 }
 
-model Files {
+model File {
   id        Int      @id @default(autoincrement())
   materi    Int?
   name      String?  @db.VarChar(255)
   path      String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  Materis   Materis? @relation(fields: [materi], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Materis   Materi?  @relation(fields: [materi], references: [id])
 
   @@index([materi], name: "materi")
+  @@map("Files")
 }
 
-model JadwalPresensis {
+model JadwalPresensi {
   id              Int               @id @default(autoincrement())
   judul           String?           @db.VarChar(255)
   start           DateTime?         @db.DateTime(0)
   end             DateTime?         @db.DateTime(0)
-  createdAt       DateTime          @db.DateTime(0)
-  updatedAt       DateTime          @db.DateTime(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   PresensiPeserta PresensiPeserta[]
+
+  @@map("JadwalPresensis")
 }
 
-model Materis {
+model Materi {
   id        Int      @id @default(autoincrement())
   bagian    String?  @db.VarChar(255)
   judul     String?  @db.VarChar(255)
   deskripsi String?  @db.Text
   embed     String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  Files     Files[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Files     File[]
+
+  @@map("Materis")
 }
 
-model Mentorings {
+model Mentoring {
   id               Int               @id @default(autoincrement())
   kelompok         String?           @db.VarChar(255)
   link             String?           @db.VarChar(255)
   detail           Int?
-  createdAt        DateTime          @db.DateTime(0)
-  updatedAt        DateTime          @db.DateTime(0)
-  DetailMentorings DetailMentorings? @relation(fields: [detail], references: [id])
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  DetailMentorings DetailMentoring?  @relation(fields: [detail], references: [id])
 
   @@index([detail], name: "detail")
+  @@map("Mentorings")
 }
 
 model PresensiPeserta {
@@ -69,17 +77,13 @@ model PresensiPeserta {
   hadir           Boolean?
   user            Int?
   jadwal          Int?
-  createdAt       DateTime         @db.DateTime(0)
-  updatedAt       DateTime         @db.DateTime(0)
-  JadwalPresensis JadwalPresensis? @relation(fields: [jadwal], references: [id])
-  Users           Users?           @relation(fields: [user], references: [id])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  JadwalPresensis JadwalPresensi?  @relation(fields: [jadwal], references: [id])
+  Users           User?            @relation(fields: [user], references: [id])
 
   @@index([jadwal], name: "presensipeserta_ibfk_2")
   @@index([user], name: "user")
-}
-
-model SequelizeMeta {
-  name String @id @unique @db.VarChar(255)
 }
 
 model SubmisiTugas {
@@ -88,9 +92,9 @@ model SubmisiTugas {
   tugas     Int?
   nama      String?  @db.VarChar(255)
   path      String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  Users     Users?   @relation(fields: [pemilik], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users     User?    @relation(fields: [pemilik], references: [id])
   Tugas     Tugas?   @relation(fields: [tugas], references: [id])
 
   @@index([pemilik], name: "pemilik")
@@ -102,13 +106,13 @@ model Tugas {
   bagian       String?        @db.VarChar(255)
   judul        String?        @db.VarChar(255)
   deskripsi    String?        @db.VarChar(255)
-  createdAt    DateTime       @db.DateTime(0)
-  updatedAt    DateTime       @db.DateTime(0)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   deadline     DateTime?      @db.DateTime(0)
   SubmisiTugas SubmisiTugas[]
 }
 
-model Users {
+model User {
   id              Int               @id @default(autoincrement())
   nama            String?           @db.VarChar(255)
   nim             String?           @db.VarChar(8)
@@ -117,19 +121,23 @@ model Users {
   hashedPassword  String?           @db.VarChar(255)
   salt            String?           @db.VarChar(255)
   role            String?           @db.VarChar(255)
-  createdAt       DateTime          @db.DateTime(0)
-  updatedAt       DateTime          @db.DateTime(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
+
+  @@map("Users")
 }
 
-model webinars {
+model webinar {
   id        Int       @id @default(autoincrement())
   ytid      String?   @db.VarChar(255)
   judul     String?   @db.VarChar(255)
   deskripsi String?   @db.VarChar(255)
   start     DateTime? @db.DateTime(0)
   end       DateTime? @db.DateTime(0)
-  createdAt DateTime  @db.DateTime(0)
-  updatedAt DateTime  @db.DateTime(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("webinars")
 }
