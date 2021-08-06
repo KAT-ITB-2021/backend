@@ -18,7 +18,7 @@ module.exports = {
 
       crypto.pbkdf2(fields.password, salt, 50000, 64, 'sha512', async (_, derivedKey) => {
         try {
-          const newUser = await prisma.users.create({
+          const newUser = await prisma.user.create({
             data: {
               nama: fields.name,
               nim: fields.nim,
@@ -54,7 +54,7 @@ module.exports = {
       const { fields } = await parseForm(req);
       if(!fields.email || !fields.password) return res.status(400).json({ message: 'Login fail' });
 
-      const user = await prisma.users.findUnique({ where: { email: fields.email } });
+      const user = await prisma.user.findUnique({ where: { email: fields.email } });
 
       if(user === null){
         res.status(400).json({ message: 'Invalid user or password' });
@@ -86,7 +86,7 @@ module.exports = {
       const { fields } = await parseForm(req);
       const { oldPassword, newPassword } = fields;
       const { id } = req.userToken;
-      const user = await prisma.users.findUnique({
+      const user = await prisma.user.findUnique({
         where: { id }
       });
 
@@ -100,7 +100,7 @@ module.exports = {
           const hashedNew = crypto.pbkdf2Sync(newPassword, newSalt, 50000, 64, 'sha512');
 
           try {
-            await prisma.users.update({
+            await prisma.user.update({
               where: {
                 id: user.id,
               },

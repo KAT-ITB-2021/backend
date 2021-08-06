@@ -14,7 +14,7 @@ module.exports = {
       const { detail, link, kelompok } = fields;
 
       try{
-        await prisma.mentorings.create({
+        await prisma.mentoring.create({
           data: {
             detail,
             link,
@@ -48,7 +48,7 @@ module.exports = {
       const { detail, link, kelompok } = fields;
       try {
 
-        await prisma.mentorings.update({
+        await prisma.mentoring.update({
           where: { id },
           data: {
             detail: detail ?? undefined,
@@ -76,7 +76,7 @@ module.exports = {
     const id = parseInt(req.params.id);
 
     try{
-      await prisma.mentorings.delete({
+      await prisma.mentoring.delete({
         where: { id }
       });
       res.json({message: 'success removing mentoring'});
@@ -95,12 +95,12 @@ module.exports = {
   async getLatestMentoring(req, res) {
     const current = new Date();
     try{
-      const mentoring = await prisma.mentorings.findFirst({
+      const mentoring = await prisma.mentoring.findFirst({
         where: {
           kelompok: {
             in: [req.userToken.kelompok.toString(), '0'],
           },
-          DetailMentorings: {
+          DetailMentoring: {
             AND: {
               start: { lte: current, },
               end: { gte: current, },
@@ -109,7 +109,7 @@ module.exports = {
         },
         select: {
           id: true,
-          DetailMentorings: {
+          DetailMentoring: {
             select: {
               id: true,
               day: true,
@@ -139,14 +139,14 @@ module.exports = {
    */,
   async getAllMentoring(req, res){
     try{
-      const mentoring = await prisma.mentorings.findMany({
+      const mentoring = await prisma.mentoring.findMany({
         where: {
           kelompok: {
             in: [req.userToken.kelompok.toString(), '0'],
           },
         },
         include: {
-          DetailMentorings: {
+          DetailMentoring: {
             select: {
               judul: true,
               deskripsi: true,
@@ -156,7 +156,7 @@ module.exports = {
           },
         },
       });
-      res.json({mentoring});
+      res.json(mentoring);
     }
     catch(err){
       console.log(err);
@@ -171,16 +171,16 @@ module.exports = {
    */
   async getAllMentoringAdmin(req, res){
     try{
-      const mentoring = await prisma.mentorings.findMany({
+      const mentoring = await prisma.mentoring.findMany({
         include: {
-          DetailMentorings: {
+          DetailMentoring: {
             select: {
               judul: true,
             },
           },
         },
       });
-      res.json({mentoring});
+      res.json(mentoring);
     }
     catch(err){
       console.log(err);
@@ -200,7 +200,7 @@ module.exports = {
     const id = parseInt(req.params.id);
 
     try{
-      const mentoring = await prisma.mentorings.findUnique({ where: { id } });
+      const mentoring = await prisma.mentoring.findUnique({ where: { id } });
       res.json(mentoring);
     }
     catch(err){

@@ -8,59 +8,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model DetailMentorings {
+model DetailMentoring {
   id         Int          @id @default(autoincrement())
   day        Int?
   judul      String?      @db.VarChar(255)
   deskripsi  String?      @db.VarChar(255)
   start      DateTime?    @db.DateTime(0)
   end        DateTime?    @db.DateTime(0)
-  createdAt  DateTime     @db.DateTime(0)
-  updatedAt  DateTime     @db.DateTime(0)
-  Mentorings Mentorings[]
+  createdAt  DateTime     @db.DateTime(0) @default(now())
+  updatedAt  DateTime     @db.DateTime(0) @updatedAt
+  Mentoring  Mentoring[]
 }
 
-model Files {
+model File {
   id        Int      @id @default(autoincrement())
   materi    Int?
   name      String?  @db.VarChar(255)
   path      String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  Materis   Materis? @relation(fields: [materi], references: [id])
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  Materi    Materi? @relation(fields: [materi], references: [id])
 
   @@index([materi], name: "materi")
 }
 
-model JadwalPresensis {
+model JadwalPresensi {
   id              Int               @id @default(autoincrement())
   judul           String?           @db.VarChar(255)
   start           DateTime?         @db.DateTime(0)
   end             DateTime?         @db.DateTime(0)
-  createdAt       DateTime          @db.DateTime(0)
-  updatedAt       DateTime          @db.DateTime(0)
+  createdAt       DateTime          @db.DateTime(0) @default(now())
+  updatedAt       DateTime          @db.DateTime(0) @updatedAt
   PresensiPeserta PresensiPeserta[]
 }
 
-model Materis {
+model Materi {
   id        Int      @id @default(autoincrement())
   bagian    String?  @db.VarChar(255)
   judul     String?  @db.VarChar(255)
   deskripsi String?  @db.Text
   embed     String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  Files     Files[]
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  File      File[]
 }
 
-model Mentorings {
+model Mentoring {
   id               Int               @id @default(autoincrement())
   kelompok         String?           @db.VarChar(255)
   link             String?           @db.VarChar(255)
   detail           Int?
-  createdAt        DateTime          @db.DateTime(0)
-  updatedAt        DateTime          @db.DateTime(0)
-  DetailMentorings DetailMentorings? @relation(fields: [detail], references: [id])
+  createdAt        DateTime          @db.DateTime(0) @default(now())
+  updatedAt        DateTime          @db.DateTime(0) @updatedAt
+  DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id])
 
   @@index([detail], name: "detail")
 }
@@ -72,8 +72,8 @@ model PresensiPeserta {
   jadwal          Int?
   createdAt       DateTime         @db.DateTime(0)
   updatedAt       DateTime         @db.DateTime(0)
-  JadwalPresensis JadwalPresensis? @relation(fields: [jadwal], references: [id])
-  Users           Users?           @relation(fields: [user], references: [id])
+  JadwalPresensi  JadwalPresensi? @relation(fields: [jadwal], references: [id])
+  User            User?           @relation(fields: [user], references: [id])
 
   @@index([jadwal], name: "presensipeserta_ibfk_2")
   @@index([user], name: "user")
@@ -91,7 +91,7 @@ model SubmisiTugas {
   path      String?  @db.VarChar(255)
   createdAt DateTime @db.DateTime(0)
   updatedAt DateTime @db.DateTime(0)
-  Users     Users?   @relation(fields: [pemilik], references: [id])
+  User      User?   @relation(fields: [pemilik], references: [id])
   Tugas     Tugas?   @relation(fields: [tugas], references: [id])
 
   @@index([pemilik], name: "pemilik")
@@ -103,13 +103,13 @@ model Tugas {
   bagian       String?        @db.VarChar(255)
   judul        String?        @db.VarChar(255)
   deskripsi    String?        @db.VarChar(255)
-  createdAt    DateTime       @db.DateTime(0)
-  updatedAt    DateTime       @db.DateTime(0)
+  createdAt    DateTime       @db.DateTime(0) @default(now())
+  updatedAt    DateTime       @db.DateTime(0) @updatedAt
   deadline     DateTime?      @db.DateTime(0)
   SubmisiTugas SubmisiTugas[]
 }
 
-model Users {
+model User {
   id              Int               @id @default(autoincrement())
   nama            String?           @db.VarChar(255)
   nim             String?           @db.VarChar(8)
@@ -118,8 +118,8 @@ model Users {
   hashedPassword  String?           @db.VarChar(255)
   salt            String?           @db.VarChar(255)
   role            String?           @db.VarChar(255)
-  createdAt       DateTime          @db.DateTime(0)
-  updatedAt       DateTime          @db.DateTime(0)
+  createdAt       DateTime          @db.DateTime(0) @default(now())
+  updatedAt       DateTime          @db.DateTime(0) @updatedAt
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
 }
@@ -131,6 +131,6 @@ model webinars {
   deskripsi String?   @db.VarChar(255)
   start     DateTime? @db.DateTime(0)
   end       DateTime? @db.DateTime(0)
-  createdAt DateTime  @db.DateTime(0)
-  updatedAt DateTime  @db.DateTime(0)
+  createdAt DateTime  @db.DateTime(0) @default(now())
+  updatedAt DateTime  @db.DateTime(0) @updatedAt
 }
