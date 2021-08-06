@@ -30,6 +30,7 @@ model File {
   Materi    Materi? @relation(fields: [materi], references: [id])
 
   @@index([materi], name: "materi")
+  @@map("Files")
 }
 
 model JadwalPresensi {
@@ -40,6 +41,8 @@ model JadwalPresensi {
   createdAt       DateTime          @db.DateTime(0) @default(now())
   updatedAt       DateTime          @db.DateTime(0) @updatedAt
   PresensiPeserta PresensiPeserta[]
+
+  @@map("JadwalPresensis")
 }
 
 model Materi {
@@ -63,6 +66,7 @@ model Mentoring {
   DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id])
 
   @@index([detail], name: "detail")
+  @@map("Mentorings")
 }
 
 model PresensiPeserta {
@@ -70,17 +74,13 @@ model PresensiPeserta {
   hadir           Boolean?
   user            Int?
   jadwal          Int?
-  createdAt       DateTime         @db.DateTime(0)
-  updatedAt       DateTime         @db.DateTime(0)
-  JadwalPresensi  JadwalPresensi? @relation(fields: [jadwal], references: [id])
-  User            User?           @relation(fields: [user], references: [id])
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  JadwalPresensis JadwalPresensi?  @relation(fields: [jadwal], references: [id])
+  Users           User?            @relation(fields: [user], references: [id])
 
   @@index([jadwal], name: "presensipeserta_ibfk_2")
   @@index([user], name: "user")
-}
-
-model SequelizeMeta {
-  name String @id @unique @db.VarChar(255)
 }
 
 model SubmisiTugas {
@@ -89,9 +89,9 @@ model SubmisiTugas {
   tugas     Int?
   nama      String?  @db.VarChar(255)
   path      String?  @db.VarChar(255)
-  createdAt DateTime @db.DateTime(0)
-  updatedAt DateTime @db.DateTime(0)
-  User      User?   @relation(fields: [pemilik], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users     User?    @relation(fields: [pemilik], references: [id])
   Tugas     Tugas?   @relation(fields: [tugas], references: [id])
 
   @@index([pemilik], name: "pemilik")
@@ -103,8 +103,8 @@ model Tugas {
   bagian       String?        @db.VarChar(255)
   judul        String?        @db.VarChar(255)
   deskripsi    String?        @db.VarChar(255)
-  createdAt    DateTime       @db.DateTime(0) @default(now())
-  updatedAt    DateTime       @db.DateTime(0) @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   deadline     DateTime?      @db.DateTime(0)
   SubmisiTugas SubmisiTugas[]
 }
@@ -118,10 +118,12 @@ model User {
   hashedPassword  String?           @db.VarChar(255)
   salt            String?           @db.VarChar(255)
   role            String?           @db.VarChar(255)
-  createdAt       DateTime          @db.DateTime(0) @default(now())
-  updatedAt       DateTime          @db.DateTime(0) @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
+
+  @@map("Users")
 }
 
 model webinar {
@@ -131,6 +133,8 @@ model webinar {
   deskripsi String?   @db.VarChar(255)
   start     DateTime? @db.DateTime(0)
   end       DateTime? @db.DateTime(0)
-  createdAt DateTime  @db.DateTime(0) @default(now())
-  updatedAt DateTime  @db.DateTime(0) @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("webinars")
 }
