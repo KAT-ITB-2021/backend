@@ -124,7 +124,7 @@ model User {
   SubmisiTugas    SubmisiTugas[]
 }
 
-model webinars {
+model webinar {
   id        Int       @id @default(autoincrement())
   ytid      String?   @db.VarChar(255)
   judul     String?   @db.VarChar(255)
