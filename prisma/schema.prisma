@@ -138,3 +138,38 @@ model webinar {
 
   @@map("webinars")
 }
+
+model GambarProduk {
+  id        Int       @id @default(autoincrement())
+  produk    Int?
+  name      String?   @db.VarChar(255)
+  path      String?   @db.VarChar(255)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Produk    Produk?   @relation(fields: [produk], references: [id])
+  
+  @@index([produk], name: "produk")
+}
+
+model Produk {
+  id            Int           @id @default(autoincrement())
+  nama          String?       @db.VarChar(255)
+  deskripsi     String?       @db.VarChar(255)
+  sponsor       Int?
+  hargaAwal     Int?        
+  hargaDiskon   Int?
+  GambarProduk  GambarProduk[]
+  Sponsor       Sponsor?      @relation(fields: [sponsor], references: [id])
+
+  @@index([sponsor], name: "sponsor")
+
+}
+
+model Sponsor {
+  id              Int       @id @default(autoincrement())
+  nama            String?   @db.VarChar(255)
+  deskripsi       String?   @db.VarChar(255)
+  tingkatSponsor  Int?
+  logoPath        String?   @db.VarChar(255)
+  Produk          Produk[]
+}
