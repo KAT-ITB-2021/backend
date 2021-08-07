@@ -142,7 +142,7 @@ model webinar {
 model GambarProduk {
   id        Int       @id @default(autoincrement())
   produk    Int?
-  name      String?   @db.VarChar(255)
+  nama      String?   @db.VarChar(255)
   path      String?   @db.VarChar(255)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -154,11 +154,15 @@ model GambarProduk {
 model Produk {
   id            Int           @id @default(autoincrement())
   nama          String?       @db.VarChar(255)
+  tipeProduk    String?       @db.VarChar(255)
   deskripsi     String?       @db.VarChar(255)
   sponsor       Int?
   hargaAwal     Int?        
   hargaDiskon   Int?
+  createdAt     DateTime      @db.DateTime(0) @default(now())
+  updatedAt     DateTime      @db.DateTime(0) @updatedAt
   GambarProduk  GambarProduk[]
+  LinkProduk    LinkProduk[]
   Sponsor       Sponsor?      @relation(fields: [sponsor], references: [id])
 
   @@index([sponsor], name: "sponsor")
@@ -166,10 +170,37 @@ model Produk {
 }
 
 model Sponsor {
-  id              Int       @id @default(autoincrement())
-  nama            String?   @db.VarChar(255)
-  deskripsi       String?   @db.VarChar(255)
+  id              Int           @id @default(autoincrement())
+  nama            String?       @db.VarChar(255)
+  deskripsi       String?       @db.VarChar(255)
   tingkatSponsor  Int?
-  logoPath        String?   @db.VarChar(255)
+  createdAt       DateTime      @db.DateTime(0) @default(now())
+  updatedAt       DateTime      @db.DateTime(0) @updatedAt
   Produk          Produk[]
+  LogoSponsor     LogoSponsor[]
+}
+
+model LogoSponsor {
+  id              Int         @id @default(autoincrement())
+  sponsor         Int?
+  nama            String?     @db.VarChar(255)
+  path            String?     @db.VarChar(255)
+  createdAt       DateTime    @db.DateTime(0) @default(now())
+  updatedAt       DateTime    @db.DateTime(0) @updatedAt
+  Sponsor         Sponsor?    @relation(fields: [sponsor], references: [id])
+
+  @@index([sponsor], name: "sponsor")
+}
+
+model LinkProduk {
+  id              Int         @id @default(autoincrement())
+  produk          Int?
+  link            String?     @db.VarChar(255)
+  jenis           String?     @db.VarChar(255)
+  linkTo          String?     @db.VarChar(255)
+  createdAt       DateTime    @db.DateTime(0) @default(now())
+  updatedAt       DateTime    @db.DateTime(0) @updatedAt
+  Produk          Produk?     @relation(fields: [produk], references:[id])
+
+  @@index([produk], name: "produk")
 }
