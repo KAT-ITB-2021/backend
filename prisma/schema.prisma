@@ -18,6 +18,8 @@ model DetailMentoring {
   createdAt  DateTime     @db.DateTime(0) @default(now())
   updatedAt  DateTime     @db.DateTime(0) @updatedAt
   Mentoring  Mentoring[]
+
+  @@map("DetailMentorings")
 }
 
 model File {
@@ -54,6 +56,8 @@ model Materi {
   createdAt DateTime @db.DateTime(0) @default(now())
   updatedAt DateTime @db.DateTime(0) @updatedAt
   File      File[]
+
+  @@map("Materis")
 }
 
 model Mentoring {
@@ -123,6 +127,7 @@ model User {
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
 
+  @@index([email])
   @@map("Users")
 }
 
