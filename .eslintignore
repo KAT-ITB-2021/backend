@@ -1,1 +1,4 @@
+.eslintrc.js
+.pnp.js
+tests/*.js
 app/database/**/*.js

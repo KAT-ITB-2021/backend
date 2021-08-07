@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../.prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model DetailMentoring {
+  id         Int          @id @default(autoincrement())
+  day        Int?
+  judul      String?      @db.VarChar(255)
+  deskripsi  String?      @db.VarChar(255)
+  start      DateTime?    @db.DateTime(0)
+  end        DateTime?    @db.DateTime(0)
+  createdAt  DateTime     @db.DateTime(0) @default(now())
+  updatedAt  DateTime     @db.DateTime(0) @updatedAt
+  Mentoring  Mentoring[]
+
+  @@map("DetailMentorings")
+}
+
+model File {
+  id        Int      @id @default(autoincrement())
+  materi    Int?
+  name      String?  @db.VarChar(255)
+  path      String?  @db.VarChar(255)
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  Materi    Materi? @relation(fields: [materi], references: [id])
+
+  @@index([materi], name: "materi")
+  @@map("Files")
+}
+
+model JadwalPresensi {
+  id              Int               @id @default(autoincrement())
+  judul           String?           @db.VarChar(255)
+  start           DateTime?         @db.DateTime(0)
+  end             DateTime?         @db.DateTime(0)
+  createdAt       DateTime          @db.DateTime(0) @default(now())
+  updatedAt       DateTime          @db.DateTime(0) @updatedAt
+  PresensiPeserta PresensiPeserta[]
+
+  @@map("JadwalPresensis")
+}
+
+model Materi {
+  id        Int      @id @default(autoincrement())
+  bagian    String?  @db.VarChar(255)
+  judul     String?  @db.VarChar(255)
+  deskripsi String?  @db.Text
+  embed     String?  @db.VarChar(255)
+  createdAt DateTime @db.DateTime(0) @default(now())
+  updatedAt DateTime @db.DateTime(0) @updatedAt
+  File      File[]
+
+  @@map("Materis")
+}
+
+model Mentoring {
+  id               Int               @id @default(autoincrement())
+  kelompok         String?           @db.VarChar(255)
+  link             String?           @db.VarChar(255)
+  detail           Int?
+  createdAt        DateTime          @db.DateTime(0) @default(now())
+  updatedAt        DateTime          @db.DateTime(0) @updatedAt
+  DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id])
+
+  @@index([detail], name: "detail")
+  @@map("Mentorings")
+}
+
+model PresensiPeserta {
+  id              Int              @id @default(autoincrement())
+  hadir           Boolean?
+  user            Int?
+  jadwal          Int?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  JadwalPresensis JadwalPresensi?  @relation(fields: [jadwal], references: [id])
+  Users           User?            @relation(fields: [user], references: [id])
+
+  @@index([jadwal], name: "presensipeserta_ibfk_2")
+  @@index([user], name: "user")
+}
+
+model SubmisiTugas {
+  id        Int      @id @default(autoincrement())
+  pemilik   Int?
+  tugas     Int?
+  nama      String?  @db.VarChar(255)
+  path      String?  @db.VarChar(255)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Users     User?    @relation(fields: [pemilik], references: [id])
+  Tugas     Tugas?   @relation(fields: [tugas], references: [id])
+
+  @@index([pemilik], name: "pemilik")
+  @@index([tugas], name: "tugas")
+}
+
+model Tugas {
+  id           Int            @id @default(autoincrement())
+  bagian       String?        @db.VarChar(255)
+  judul        String?        @db.VarChar(255)
+  deskripsi    String?        @db.VarChar(255)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  deadline     DateTime?      @db.DateTime(0)
+  SubmisiTugas SubmisiTugas[]
+}
+
+model User {
+  id              Int               @id @default(autoincrement())
+  nama            String?           @db.VarChar(255)
+  nim             String?           @db.VarChar(8)
+  email           String?           @unique @db.VarChar(255)
+  kelompok        Int?
+  hashedPassword  String?           @db.VarChar(255)
+  salt            String?           @db.VarChar(255)
+  role            String?           @db.VarChar(255)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  PresensiPeserta PresensiPeserta[]
+  SubmisiTugas    SubmisiTugas[]
+
+  @@index([email])
+  @@map("Users")
+}
+
+model webinar {
+  id        Int       @id @default(autoincrement())
+  ytid      String?   @db.VarChar(255)
+  judul     String?   @db.VarChar(255)
+  deskripsi String?   @db.VarChar(255)
+  start     DateTime? @db.DateTime(0)
+  end       DateTime? @db.DateTime(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("webinars")
+}

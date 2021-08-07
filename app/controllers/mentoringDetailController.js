@@ -1,6 +1,6 @@
-const { DetailMentoring, Mentoring } = require('../database/models');
 const { parseForm } = require('../helper/parseform');
 const { unixSecondsToDate } = require('../helper/parseUnix');
+const prisma = require('../helper/prisma');
 
 module.exports = {
   /**
@@ -15,8 +15,10 @@ module.exports = {
       const start = unixSecondsToDate(fields.start);
       const end = unixSecondsToDate(fields.end);
       try{
-        await DetailMentoring.create({
-          day, judul, deskripsi, start, end
+        await prisma.detailMentoring.create({
+          data: {
+            day, judul, deskripsi, start, end,
+          },
         });
         res.json({message: 'success adding mentoring detail'});
       }
@@ -35,22 +37,25 @@ module.exports = {
    * `start` and `end` must be formatted as seconds since UNIX epoch
    */
   async editDetailMentoring(req, res){
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (!id)
+      res.status(400).json({message: 'error editing mentoring detail'});
     try{
       const { fields } = await parseForm(req);
       const { day, judul, deskripsi } = fields;
       const start = unixSecondsToDate(fields.start);
       const end = unixSecondsToDate(fields.end);
       try{
-        const mentoring = await DetailMentoring.findOne({
-          where: { id }
+        await prisma.detailMentoring.update({
+          where: { id },
+          data: {
+            day: day ?? undefined,
+            judul: judul ?? undefined,
+            deskripsi: deskripsi ?? undefined,
+            start: start ?? undefined,
+            end: end ?? undefined,
+          },
         });
-        if(day) mentoring.day = day;
-        if(judul) mentoring.judul = judul;
-        if(deskripsi) mentoring.deskripsi = deskripsi;
-        if(start) mentoring.start = start;
-        if(end) mentoring.end = end;
-        await mentoring.save();
         res.json({message: 'success editing mentoring detail'});
       }
       catch(err){
@@ -66,10 +71,13 @@ module.exports = {
    * Route to delete Mentoring Detail by id
    */
   async removeDetailMentoring(req, res){
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (!id)
+      res.status(400).json({message: 'error editing mentoring detail'});
+
     try{
-      await DetailMentoring.destroy({
-        where: { id }
+      await prisma.detailMentoring.delete({
+        where: { id },
       });
       res.json({message: 'success removing mentoring detail'});
     }
@@ -85,10 +93,13 @@ module.exports = {
    */
   async getAllDetailMentorings(_, res){
     try{
-      const mentoringDetails = await DetailMentoring.findAll({
-        attributes: ['id', 'judul']
+      const mentoringDetails = await prisma.detailMentoring.findMany({
+        select: {
+          id: true,
+          judul: true,
+        },
       });
-      res.json({mentoringDetails});
+      res.json(mentoringDetails);
     }
     catch(err){
       console.log(err);
@@ -101,12 +112,19 @@ module.exports = {
    * `id`, `day`, `judul`, `deskripsi`, `start`, `end`
    */
   async getOneDetailMentoring(req, res){
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (!id)
+      res.status(400).json({message: 'error editing mentoring detail'});
+
     try{
-      const mentoringDetail = await DetailMentoring.findOne({
+      const mentoringDetail = await prisma.detailMentoring.findUnique({
         where: { id },
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
+        select: {
+          id: true,
+          day: true,
+          deskripsi: true,
+          start: true,
+          end: true,
         }
       });
       res.json(mentoringDetail);
@@ -118,17 +136,23 @@ module.exports = {
   },
   /**
    * Route to get associated mentorings
-   * returns object with `mentorings` property, which holds array of Mentoring: 
+   * returns object with `mentorings` property, which holds array of Mentoring:
    * [{`id`, `kelompok`, `detail`, `link`}]
    */
   async getAssociatedMentorings(req, res){
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (!id)
+      res.status(400).json({message: 'error fetching mentoring list'});
+
     try{
-      const mentoringDetails = await Mentoring.findOne({
-        where: { id }
+      const mentoringDetails = await prisma.mentoring.findUnique({
+        where: { id },
+        include: {
+          DetailMentoring: true,
+        },
       });
-      const mentorings = await mentoringDetails.getMentorings();
-      res.json({mentorings});
+      console.log({ mentoringDetails, id });
+      res.json(mentoringDetails.DetailMentoring);
     }
     catch(err){
       console.log(err);

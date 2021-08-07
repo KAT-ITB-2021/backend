@@ -20,6 +20,6 @@ router.post('/mentoringdetail/edit/:id', editDetailMentoring);
 router.post('/mentoringdetail/remove/:id', removeDetailMentoring);
 router.post('/mentoringdetail/getall', getAllDetailMentorings);
 router.post('/mentoringdetail/get/:id', getOneDetailMentoring);
-router.post('/mentoringdetail/mentorings', getAssociatedMentorings);
+router.post('/mentoringdetail/mentorings/:id', getAssociatedMentorings);
 
 module.exports = router;
