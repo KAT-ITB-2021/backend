@@ -19,7 +19,7 @@ module.exports = {
           data: {
             start, end, ytid, judul, deskripsi
           }
-        })
+        });
         res.json({message: 'success adding webinar'});
       }
       catch(err){
@@ -60,8 +60,6 @@ module.exports = {
 
     try{
       const { fields } = await parseForm(req);
-      const start = unixSecondsToDate(fields.start);
-      const end = unixSecondsToDate(fields.end);
       const { ytid, judul, deskripsi } = fields;
 
       try{
@@ -74,7 +72,7 @@ module.exports = {
             judul: judul ?? undefined,
             deskripsi: deskripsi ?? undefined,
           }
-        })
+        });
         res.json({message: 'success editing webinar'});
       }
       catch(err){
@@ -101,7 +99,7 @@ module.exports = {
           end: true,
           ytid: true,
         }
-      })
+      });
       res.json(webinar);
     }
     catch(err){

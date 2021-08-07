@@ -126,7 +126,7 @@ module.exports = {
           start: true,
           end: true,
         }
-      })
+      });
       res.json(mentoringDetail);
     }
     catch(err){
