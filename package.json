@@ -35,6 +35,6 @@
     "supertest": "^6.1.3"
   },
   "resolutions": {
-    "@prisma/client/.prisma": "link:node_modules/.prisma"
+    "@prisma/client/.prisma": "link:.prisma"
   }
 }
