@@ -146,23 +146,23 @@ module.exports = {
   /**
    * Route to update sponsor by id
    * everything is passed by mulitpart/form-data
-   * possible fields: `judul`, `deskripsi`, `link`
+   * possible fields: `nama`, `deskripsi`, `tingkatSponsor`
    * gambar is impossible to delete
    */
   async editSponsor(req, res) {
     try {
-      const { fields, files } = await parseForm(req);
-      await prisma.sponsor.update({
+      const { fields } = await parseForm(req);
+      const sponsor = await prisma.sponsor.update({
         where: {
           id: +req.params.id,
         },
         data: {
-          nama: fields.bagian ?? undefined,
-          deskripsi: fields.judul ?? undefined,
-          tingkatSponsor: fields.deskripsi ?? undefined,
-          embed: fields.embed ?? undefined,
+          nama: fields.nama ?? undefined,
+          deskripsi: fields.deskripsi ?? undefined,
+          tingkatSponsor: fields.tingkatSponsor ?? undefined,
         },
       });
+      
       res.json({
         message: 'Edit success',
       });
@@ -356,6 +356,40 @@ module.exports = {
     } catch (err) {
       console.log(err);
       res.status(400).json({ message: 'Error' });
+    }
+  },
+
+  /**
+   * Route to update produk by id
+   * everything is passed by mulitpart/form-data
+   * possible fields: `nama`, `tipeProduk`, `deskripsi`, `sponsor`, `hargaAwal`, `hargaDiskon`
+   * gambar is impossible to delete
+   */
+   async editProduk(req, res) {
+    try {
+      const { fields } = await parseForm(req);
+      await prisma.produk.update({
+        where: {
+          id: +req.params.id,
+        },
+        data: {
+          nama: fields.nama ?? undefined,
+          tipeProduk: fields.tipeProduk ?? undefined,
+          deskripsi: fields.deskripsi ?? undefined,
+          sponsor: fields.sponsor ?? undefined,
+          hargaAwal: fields.hargaAwal ?? undefined,
+          hargaDiskon: fields.hargaDiskon ?? undefined,
+        },
+      });
+      
+      res.json({
+        message: 'Edit success',
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        message: 'Edit fail',
+      });
     }
   },
 
