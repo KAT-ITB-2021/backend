@@ -100,7 +100,7 @@ module.exports = {
           ytid: true,
         }
       });
-      res.json(webinar);
+      res.json({webinar});
     }
     catch(err){
       console.log(err);
