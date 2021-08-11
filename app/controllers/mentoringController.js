@@ -158,7 +158,7 @@ module.exports = {
           },
         },
       });
-      res.json(mentoring);
+      res.json({mentoring});
     }
     catch(err){
       console.log(err);
@@ -182,7 +182,7 @@ module.exports = {
           },
         },
       });
-      res.json(mentoring);
+      res.json({mentoring});
     }
     catch(err){
       console.log(err);
