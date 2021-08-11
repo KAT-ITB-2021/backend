@@ -30,14 +30,15 @@ module.exports = {
                 const pathInBucket = `${nama}_${i}_${file.nama}`;
                 uploadFile(logo.path, pathInBucket)
                   .then(() => {
-                    await prisma.logosponsor.create({
-                      data: {
-                        sponsor: sponsor.id,
-                        nama: file.name,
-                        path: pathInBucket,
-                      },
-                    });
-                    resolve();
+                    prisma.logosponsor
+                      .create({
+                        data: {
+                          sponsor: sponsor.id,
+                          nama: file.name,
+                          path: pathInBucket,
+                        },
+                      })
+                      .then(() => resolve());
                   })
                   .catch((err) => {
                     console.log(err);
@@ -162,7 +163,7 @@ module.exports = {
           tingkatSponsor: fields.tingkatSponsor ?? undefined,
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -365,7 +366,7 @@ module.exports = {
    * possible fields: `nama`, `tipeProduk`, `deskripsi`, `sponsor`, `hargaAwal`, `hargaDiskon`
    * gambar is impossible to delete
    */
-   async editProduk(req, res) {
+  async editProduk(req, res) {
     try {
       const { fields } = await parseForm(req);
       await prisma.produk.update({
@@ -381,7 +382,7 @@ module.exports = {
           hargaDiskon: fields.hargaDiskon ?? undefined,
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -412,7 +413,7 @@ module.exports = {
       res.json(produk);
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error' });
     }
   },
 
@@ -426,7 +427,7 @@ module.exports = {
       const produks = await prisma.produk.findMany({
         include: {
           GambarProduk: true,
-          LinkProduk: true
+          LinkProduk: true,
         },
       });
       res.json({
@@ -434,8 +435,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error' });
     }
-    
   },
 };
