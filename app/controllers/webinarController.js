@@ -1,7 +1,6 @@
-const { Webinar } = require('../database/models');
-const { Op } = require('sequelize');
 const { unixSecondsToDate } = require('../helper/parseUnix');
 const { parseForm } = require('../helper/parseform');
+const prisma = require('../helper/prisma');
 
 module.exports = {
   /**
@@ -16,8 +15,10 @@ module.exports = {
       const end = unixSecondsToDate(fields.end);
       const { ytid, judul, deskripsi } = fields;
       try{
-        await Webinar.create({
-          start, end, ytid, judul, deskripsi
+        await prisma.webinar.create({
+          data: {
+            start, end, ytid, judul, deskripsi
+          }
         });
         res.json({message: 'success adding webinar'});
       }
@@ -34,9 +35,13 @@ module.exports = {
    * Route to remove Webinar by Id
    */
   async removeWebinar(req, res){
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
+    if (!id) res.status(400).json({message: 'error removing webinar'});
+
     try{
-      await Webinar.destroy({ where: { id }});
+      await prisma.webinar.delete({
+        where: { id },
+      });
       res.json({message: 'success removing webinar'});
     }
     catch(err){
@@ -50,22 +55,24 @@ module.exports = {
    * all fields optional
    */
   async editWebinar(req, res){
-    const id = req.params.id;
+    const id = parseInt(req.params.id);
+    if (!id) res.status(400).json({message: 'error editing webinar'});
+
     try{
       const { fields } = await parseForm(req);
-      const start = unixSecondsToDate(fields.start);
-      const end = unixSecondsToDate(fields.end);
       const { ytid, judul, deskripsi } = fields;
+
       try{
-        const webinar = await Webinar.findOne({
-          where: { id }
+        await prisma.webinar.update({
+          where: { id },
+          data: {
+            start: fields.start ?? undefined,
+            end: fields.end ?? undefined,
+            ytid: ytid ?? undefined,
+            judul: judul ?? undefined,
+            deskripsi: deskripsi ?? undefined,
+          }
         });
-        if(start) webinar.start = start;
-        if(end) webinar.end = end;
-        if(ytid) webinar.ytid = ytid;
-        if(judul) webinar.judul = judul;
-        if(deskripsi) webinar.deskripsi = deskripsi;
-        await webinar.save();
         res.json({message: 'success editing webinar'});
       }
       catch(err){
@@ -84,9 +91,13 @@ module.exports = {
    */
   async listWebinar(_, res){
     try{
-      const webinar = await Webinar.findAll({
-        attributes: {
-          exclude: ['createdAt', 'updatedAt', 'deskripsi']
+      const webinar = await prisma.webinar.findMany({
+        select: {
+          id: true,
+          judul: true,
+          start: true,
+          end: true,
+          ytid: true,
         }
       });
       res.json({webinar});
@@ -103,22 +114,31 @@ module.exports = {
    * could be empty if there is no webinar
    */
   async currentWebinar(_, res){
-    const current = Date.now();
+    const current = new Date;
     try{
-      const webinar = await Webinar.findOne({
+      const webinar = await prisma.webinar.findFirst({
         where: {
-          [Op.and]: [
-            { start: {
-              [Op.lte]: current
-            } },
-            { end: {
-              [Op.gte]: current
-            }}
+          AND: [
+            {
+              start: {
+                lte: current,
+              }
+            },
+            {
+              end: {
+                gte: current,
+              }
+            }
           ]
         },
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        }
+        select: {
+          id: true,
+          judul: true,
+          deskripsi: true,
+          ytid: true,
+          start: true,
+          end: true,
+        },
       });
       res.json(webinar);
     }
@@ -133,10 +153,12 @@ module.exports = {
    * {`id`, `ytid`, `judul`, `deskripsi`, `start`, `end`}
    */
   async getWebinarById(req, res){
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    if (!id) res.status(400).json({message: 'error fetching webinar'});
+
     try{
-      const webinar = await Webinar.findOne({
-        where: { id }
+      const webinar = await prisma.webinar.findUnique({
+        where: { id },
       });
       res.json(webinar);
     }

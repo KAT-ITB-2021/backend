@@ -2,15 +2,8 @@
 node_modules/
 
 # yarn: https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
-
-.pnp.*
+.yarn/unplugged
+.yarn/build-state.yml
 
 # log files
 *.log
@@ -21,3 +14,4 @@ gkey.json
 
 # database
 database_datas
+.prisma

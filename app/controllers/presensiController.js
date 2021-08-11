@@ -1,6 +1,5 @@
-const { JadwalPresensi, PresensiPeserta } = require('../database/models');
+const prisma = require('../helper/prisma');
 const { unixSecondsToDate } = require('../helper/parseUnix');
-const { Op } = require('sequelize');
 const { parseForm } = require('../helper/parseform');
 
 module.exports = {
@@ -16,8 +15,10 @@ module.exports = {
       const end = unixSecondsToDate(fields.end);
       const { judul } = fields;
       try{
-        await JadwalPresensi.create({
-          judul, start, end
+        await prisma.jadwalPresensi.create({
+          data:{
+            judul, start, end
+          }
         });
         res.json({message: 'success add jadwal'});
       }
@@ -34,9 +35,9 @@ module.exports = {
    * Route to remove JadwalPresensi by id
    */
   async removeJadwal(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
-      await JadwalPresensi.destroy({
+      await prisma.jadwalPresensi.delete({
         where: { id }
       });
       res.json({message: 'success remove jadwal'});
@@ -53,20 +54,21 @@ module.exports = {
    * `judul`, `start` and `end`, both of which is formatted as seconds since UNIX epochs.
    */
   async editJadwal(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
       const { fields } = await parseForm(req);
       const start = unixSecondsToDate(fields.start) ?? false;
       const end = unixSecondsToDate(fields.end) ?? false;
       const { judul } = fields;
       try{
-        const jadwal = await JadwalPresensi.findOne({
-          where: { id }
+        await prisma.jadwalPresensi.update({
+          where: { id },
+          data: {
+            judul: judul ?? undefined,
+            start: start ?? undefined,
+            end: end ?? undefined
+          }
         });
-        if(judul) jadwal.judul = judul;
-        if(start) jadwal.start = start;
-        if(end) jadwal.end = end;
-        await jadwal.save();
         res.json({message: 'success edit jadwal'});
       }
       catch(err){
@@ -85,11 +87,7 @@ module.exports = {
    */
   async getAllJadwal(_, res){
     try{
-      const jadwal = await JadwalPresensi.findAll({
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        }
-      });
+      const jadwal = await prisma.jadwalPresensi.findMany();
       res.json({jadwal});
     }
     catch(err){
@@ -103,11 +101,10 @@ module.exports = {
    * {`id`, `judul`, `start`, `end`}
    */
   async getJadwalById(req, res){
-    const { id } = req.params;
+    const id = +req.params.id;
     try{
-      const jadwal = await JadwalPresensi.findOne({
+      const jadwal = await prisma.jadwalPresensi.findUnique({
         where: { id },
-        exclude: ['createdAt', 'updatedAt']
       });
       res.json(jadwal);
     }
@@ -120,39 +117,57 @@ module.exports = {
    * Route to add presensi or set presensi to true by JadwalPresensi id
    */
   async daftarkanPresensi(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     const now = new Date();
     try{
-      const jadwal = await JadwalPresensi.findOne({
+      const jadwal = await prisma.jadwalPresensi.findFirst({
         where: {
-          id,
-          [Op.and]: {
-            start: {
-              [Op.lte]: now
+          AND: [
+            { id },
+            {
+              start: {
+                lte: now
+              }
             },
-            end: {
-              [Op.gte]: now
+            {
+              end: {
+                gte: now
+              }
             }
-          }
+          ]
         }
       });
       if(!jadwal) res.status(400).json({message: 'presensi not available'});
       else{
-        const presensi = await PresensiPeserta.findOne({
+        const presensi = await prisma.presensiPeserta.findFirst({
           where: {
-            user: req.userToken.id,
-            jadwal: id
+            Users: {
+              id: req.userToken.id
+            },
+            JadwalPresensis: { id }
           }
         });
         if(presensi){
-          presensi.hadir = true;
-          await presensi.save();
+          await prisma.presensiPeserta.update({
+            where: { id: presensi.id },
+            data: { hadir: true }
+          });
         }
         else{
-          await PresensiPeserta.create({
-            user: req.userToken.id,
-            jadwal: id,
-            hadir: true
+          await prisma.presensiPeserta.create({
+            data: {
+              Users: {
+                connect: {
+                  id: req.userToken.id
+                }
+              },
+              JadwalPresensis: {
+                connect: {
+                  id
+                }
+              },
+              hadir: true
+            }
           });
         }
         res.json({message: 'success registering presensi'});
@@ -167,35 +182,28 @@ module.exports = {
    * Route to set presensi to false by id
    */
   async hapuskanPresensi(req, res){
-    const id = req.params.id;
-    const now = new Date();
+    const id = +req.params.id;
     try{
-      const presensi = await PresensiPeserta.findOne({
-        where: {
-          user: req.userToken.id,
-          jadwal: id,
-        },
-        include: {
-          model: JadwalPresensi,
+      try{
+        const presensi = await prisma.presensiPeserta.findFirst({
           where: {
-            [Op.and]: {
-              start: {
-                [Op.lte]: now
-              },
-              end: {
-                [Op.gte]: now
-              }
-            }
+            Users: {
+              id: req.userToken.id
+            },
+            JadwalPresensis: { id }
           }
-        }
-      });
-      if(presensi){
-        presensi.hadir = false;
-        await presensi.save();
-        res.json({message: 'success removing presensi'});
+        });
+        await prisma.presensiPeserta.update({
+          where: { id: presensi.id },
+          data: {
+            hadir: false
+          }
+        });
+        res.json({message: 'success unregistering presensi'});
       }
-      else{
-        res.status(400).json({message: 'presensi not registered yet'});
+      catch(err){
+        console.log(err);
+        res.status(400).json({message: 'presensi not registered'});
       }
     }
     catch(err){
@@ -210,15 +218,13 @@ module.exports = {
    */
   async listPresensiPeserta(req, res){
     try{
-      const presensi = await PresensiPeserta.findAll({
+      const presensi = await prisma.presensiPeserta.findMany({
         where: {
-          user: req.userToken.id,
+          Users: { id: +req.userToken.id },
         },
         include: {
-          model: JadwalPresensi,
-          attributes: ['id', 'judul', 'start', 'end']
+          JadwalPresensis: true
         },
-        attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
       });
       res.json(presensi);
     }
@@ -240,15 +246,13 @@ module.exports = {
       if(!fields.userid) res.status(400).json({message: 'userid must not be empty'});
       else{
         try{
-          const presensi = await PresensiPeserta.findAll({
+          const presensi = await prisma.presensiPeserta.findMany({
             where: {
-              user: fields.userid
+              Users: { id: +fields.userid }
             },
             include: {
-              model: JadwalPresensi,
-              attributes: ['id', 'judul', 'start', 'end']
-            },
-            attributes: { exclude: ['user', 'createdAt', 'updatedAt']}
+              JadwalPresensis: true
+            }
           });
           res.json(presensi);
         }
