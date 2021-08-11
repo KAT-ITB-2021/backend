@@ -30,15 +30,14 @@ module.exports = {
                 const pathInBucket = `${nama}_${i}_${file.nama}`;
                 uploadFile(logo.path, pathInBucket)
                   .then(() => {
-                    prisma.logosponsor
-                      .create({
-                        data: {
-                          sponsor: sponsor.id,
-                          nama: file.name,
-                          path: pathInBucket,
-                        },
-                      })
-                      .then(() => resolve());
+                    // Line 33 sampe 41 aku ubah soalnya ga bisa await di fungsi non-async -Josep
+                    prisma.logosponsor.create({
+                      data: {
+                        sponsor: sponsor.id,
+                        nama: file.name,
+                        path: pathInBucket,
+                      },
+                    }).then(() => resolve()); // TODO: is this okay?
                   })
                   .catch((err) => {
                     console.log(err);

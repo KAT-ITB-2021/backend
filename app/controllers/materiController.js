@@ -9,7 +9,7 @@ module.exports = {
    * in the form-data, 4 fields are needed: `bagian`, `judul`, `deskripsi`, `embed`
    * embed is a link to youtube video that could be embedded
    * the rest is self explanatory
-   * Files are uploaded in `file` field.
+   * File are uploaded in `file` field.
    */
   async addMateri(req, res){
     try{
@@ -63,11 +63,11 @@ module.exports = {
       const materi = await prisma.materi.delete({
         where: { id },
         include: {
-          Files: true
+          File: true
         }
       });
       const fileIds = [];
-      await Promise.all(materi.Files.map((file) => new Promise((resolve, reject) => {
+      await Promise.all(materi.File.map((file) => new Promise((resolve, reject) => {
         deleteFile(file.path).then(resolve).catch(reject);
         fileIds.push(file.id);
       })));
@@ -87,7 +87,7 @@ module.exports = {
    * Route to update materi by id
    * everything is passed by mulitpart/form-data
    * possible fields: `judul`, `deskripsi`, `link`
-   * Files are not possible to delete
+   * File are not possible to delete
    */
   async editMateri(req, res){
     try{
@@ -117,7 +117,7 @@ module.exports = {
   async getAllMateri(_, res){
     const materis = await prisma.materi.findMany({
       include: {
-        Files: true
+        File: true
       }
     });
     res.json({materis});
@@ -133,7 +133,7 @@ module.exports = {
       const materi = await prisma.materi.findUnique({
         where: { id },
         include: {
-          Files: true
+          File: true
         }
       });
       if(materi !== null){
