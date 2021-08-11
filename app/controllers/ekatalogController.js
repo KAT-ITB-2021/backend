@@ -30,14 +30,14 @@ module.exports = {
                 const pathInBucket = `${nama}_${i}_${file.nama}`;
                 uploadFile(logo.path, pathInBucket)
                   .then(() => {
-                    await prisma.logosponsor.create({
+                    // Line 33 sampe 41 aku ubah soalnya ga bisa await di fungsi non-async -Josep
+                    prisma.logosponsor.create({
                       data: {
                         sponsor: sponsor.id,
                         nama: file.name,
                         path: pathInBucket,
                       },
-                    });
-                    resolve();
+                    }).then(() => resolve()); // TODO: is this okay?
                   })
                   .catch((err) => {
                     console.log(err);
@@ -365,7 +365,7 @@ module.exports = {
    * possible fields: `nama`, `tipeProduk`, `deskripsi`, `sponsor`, `hargaAwal`, `hargaDiskon`
    * gambar is impossible to delete
    */
-   async editProduk(req, res) {
+  async editProduk(req, res) {
     try {
       const { fields } = await parseForm(req);
       await prisma.produk.update({
@@ -412,7 +412,7 @@ module.exports = {
       res.json(produk);
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error'});
     }
   },
 
@@ -434,7 +434,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error'});
     }
     
   },
