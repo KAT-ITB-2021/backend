@@ -100,7 +100,7 @@ module.exports = {
           judul: true,
         },
       });
-      res.json(mentoringDetails);
+      res.json({mentoringDetails});
     }
     catch(err){
       console.log(err);
@@ -153,7 +153,7 @@ module.exports = {
         },
       });
       console.log({ mentoringDetails, id });
-      res.json(mentoringDetails.DetailMentoring);
+      res.json({mentorings: mentoringDetails.DetailMentoring});
     }
     catch(err){
       console.log(err);

@@ -162,7 +162,7 @@ module.exports = {
           tingkatSponsor: fields.tingkatSponsor ?? undefined,
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -381,7 +381,7 @@ module.exports = {
           hargaDiskon: fields.hargaDiskon ?? undefined,
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -412,7 +412,7 @@ module.exports = {
       res.json(produk);
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'});
+      res.status(400).json({ message: 'error' });
     }
   },
 
@@ -426,7 +426,7 @@ module.exports = {
       const produks = await prisma.produk.findMany({
         include: {
           GambarProduk: true,
-          LinkProduk: true
+          LinkProduk: true,
         },
       });
       res.json({
@@ -434,8 +434,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'});
+      res.status(400).json({ message: 'error' });
     }
-    
   },
 };
