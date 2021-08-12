@@ -1,6 +1,7 @@
-const prisma = require('../helper/prisma');
 const { parseForm } = require('../helper/parseform');
 const { uploadFile, deleteFile } = require('../helper/uploader');
+const prisma = require('../helper/prisma');
+
 
 module.exports = {
   /**
@@ -27,21 +28,22 @@ module.exports = {
           logos.map(
             (logo, i) =>
               new Promise((resolve, reject) => {
-                const pathInBucket = `${nama}_${i}_${file.nama}`;
+                const pathInBucket = `${nama}_${i}_${logo.nama}`;
                 uploadFile(logo.path, pathInBucket)
                   .then(() => {
-                    await prisma.logosponsor.create({
+                    prisma.logosponsor.create({
                       data: {
                         Sponsor: {
                           connect: {
                             id: +sponsor.id,
                           },
                         },
-                        nama: file.name,
+                        nama: logo.name,
                         path: pathInBucket,
                       },
+                    }).then(() => {
+                      resolve();
                     });
-                    resolve();
                   })
                   .catch((err) => {
                     console.log(err);
@@ -86,7 +88,7 @@ module.exports = {
       //delete its logos
       let logoSponsorId = [];
       await Promise.all(
-        sponsor.LogoSponsor.map((logo, i) => {
+        sponsor.LogoSponsor.map((logo) => {
           new Promise((resolve, reject) => {
             deleteFile(logo.path)
               .then(() => {
@@ -112,10 +114,10 @@ module.exports = {
       let gambarIds = [];
       let produkIds = [];
       await Promise.all(
-        sponsor.Produk.map((produk, i) => {
+        sponsor.Produk.map((produk) => {
           produkIds.push(produk.id);
           new Promise((resolve, reject) => {
-            produk.GambarProduk.map((gambar, i) => {
+            produk.GambarProduk.map((gambar) => {
               deleteFile(gambar.path).then(resolve).catch(reject);
               gambarIds.push(gambar.id);
             });
@@ -156,7 +158,7 @@ module.exports = {
   async editSponsor(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const sponsor = await prisma.sponsor.update({
+      await prisma.sponsor.update({
         where: {
           id: +req.params.id,
         },
@@ -265,11 +267,12 @@ module.exports = {
       },
     });
 
+    let linkProduks = linkProduk;
     // create LinkProduks
-    if (LinkProduk) {
-      if (Array.isArray(linkProduk)) linkProduk = [linkProduk];
+    if (linkProduks) {
+      if (Array.isArray(linkProduks)) linkProduks = [linkProduks];
       await prisma.linkproduk.createMany({
-        data: linkProduk.map((link, i) => {
+        data: linkProduks.map((link) => {
           return {
             Produk: {
               connect: {
@@ -344,7 +347,7 @@ module.exports = {
       let gambarIds = [];
       await Promise.all(
         produk.GambarProduk.map(
-          (gambar, i) =>
+          (gambar) =>
             new Promise((resolve, reject) => {
               deleteFile(gambar.path).then(resolve).catch(reject);
               gambarIds.push(gambar.id);
