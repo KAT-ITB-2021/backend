@@ -5,9 +5,9 @@ __metadata:
   version: 4
   cacheKey: 7
 
-".prisma@link:node_modules/.prisma::locator=backend-kat%40workspace%3A.":
+".prisma@link:.prisma::locator=backend-kat%40workspace%3A.":
   version: 0.0.0-use.local
-  resolution: ".prisma@link:node_modules/.prisma::locator=backend-kat%40workspace%3A."
+  resolution: ".prisma@link:.prisma::locator=backend-kat%40workspace%3A."
   languageName: node
   linkType: soft
 
