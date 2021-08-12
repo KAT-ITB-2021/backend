@@ -136,7 +136,9 @@ module.exports = {
           data: {
             nama: files.file.name,
             path: bucketPath,
-            pemilik: req.userToken.id,
+            Users:{
+              connect: { id: req.userToken.id }
+            },
             Tugas: {
               connect: { id }
             }
