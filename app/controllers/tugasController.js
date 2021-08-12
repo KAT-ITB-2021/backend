@@ -137,7 +137,7 @@ module.exports = {
             nama: files.file.name,
             path: bucketPath,
             pemilik: req.userToken.id,
-            tugas: {
+            Tugas: {
               connect: { id }
             }
           }
@@ -185,9 +185,7 @@ module.exports = {
           Tugas: {
             id
           },
-          Users: {
-            kelompokFilter
-          }
+          Users: kelompokFilter
         }
       });
       res.json({submisi});
