@@ -32,7 +32,11 @@ module.exports = {
                   .then(() => {
                     await prisma.logosponsor.create({
                       data: {
-                        sponsor: sponsor.id,
+                        Sponsor: {
+                          connect: {
+                            id: +sponsor.id,
+                          },
+                        },
                         nama: file.name,
                         path: pathInBucket,
                       },
@@ -162,7 +166,7 @@ module.exports = {
           tingkatSponsor: fields.tingkatSponsor ?? undefined,
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -252,9 +256,13 @@ module.exports = {
       nama,
       tipeProduk,
       deskripsi,
-      sponsor,
       hargaAwal,
       hargaDiskon,
+      Sponsor: {
+        connect: {
+          id: +sponsor,
+        },
+      },
     });
 
     // create LinkProduks
@@ -263,7 +271,11 @@ module.exports = {
       await prisma.linkproduk.createMany({
         data: linkProduk.map((link, i) => {
           return {
-            produk: produk.id,
+            Produk: {
+              connect: {
+                id: +produk.id,
+              },
+            },
             link: link.link,
             jenis: link.jenis,
             linkTo: link.linkTo,
@@ -283,7 +295,11 @@ module.exports = {
             prisma.GambarProduk.create({
               nama: file.name,
               path: pathInBucket,
-              produk: produk.id,
+              Produk: {
+                connect: {
+                  id: +produk.id,
+                },
+              },
             })
               .then(() => {
                 resolve();
@@ -365,7 +381,7 @@ module.exports = {
    * possible fields: `nama`, `tipeProduk`, `deskripsi`, `sponsor`, `hargaAwal`, `hargaDiskon`
    * gambar is impossible to delete
    */
-   async editProduk(req, res) {
+  async editProduk(req, res) {
     try {
       const { fields } = await parseForm(req);
       await prisma.produk.update({
@@ -376,12 +392,16 @@ module.exports = {
           nama: fields.nama ?? undefined,
           tipeProduk: fields.tipeProduk ?? undefined,
           deskripsi: fields.deskripsi ?? undefined,
-          sponsor: fields.sponsor ?? undefined,
           hargaAwal: fields.hargaAwal ?? undefined,
           hargaDiskon: fields.hargaDiskon ?? undefined,
+          Sponsor: {
+            connect: {
+              id: fields.sponsor ?? undefined,
+            },
+          },
         },
       });
-      
+
       res.json({
         message: 'Edit success',
       });
@@ -412,7 +432,7 @@ module.exports = {
       res.json(produk);
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error' });
     }
   },
 
@@ -426,7 +446,7 @@ module.exports = {
       const produks = await prisma.produk.findMany({
         include: {
           GambarProduk: true,
-          LinkProduk: true
+          LinkProduk: true,
         },
       });
       res.json({
@@ -434,8 +454,7 @@ module.exports = {
       });
     } catch (err) {
       console.log(err);
-      res.status(400).json({ message: 'error'})
+      res.status(400).json({ message: 'error' });
     }
-    
   },
 };
