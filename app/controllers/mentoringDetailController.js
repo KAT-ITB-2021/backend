@@ -17,7 +17,7 @@ module.exports = {
       try{
         await prisma.detailMentoring.create({
           data: {
-            day, judul, deskripsi, start, end,
+            day: parseInt(day), judul, deskripsi, start, end,
           },
         });
         res.json({message: 'success adding mentoring detail'});
@@ -45,11 +45,12 @@ module.exports = {
       const { day, judul, deskripsi } = fields;
       const start = unixSecondsToDate(fields.start);
       const end = unixSecondsToDate(fields.end);
+      const numDay = parseInt(day);
       try{
         await prisma.detailMentoring.update({
           where: { id },
           data: {
-            day: day ?? undefined,
+            day: isNaN(numDay) ? undefined : numDay,
             judul: judul ?? undefined,
             deskripsi: deskripsi ?? undefined,
             start: start ?? undefined,
@@ -99,7 +100,7 @@ module.exports = {
           judul: true,
         },
       });
-      res.json(mentoringDetails);
+      res.json({mentoringDetails});
     }
     catch(err){
       console.log(err);
@@ -126,7 +127,7 @@ module.exports = {
           start: true,
           end: true,
         }
-      })
+      });
       res.json(mentoringDetail);
     }
     catch(err){
@@ -152,7 +153,7 @@ module.exports = {
         },
       });
       console.log({ mentoringDetails, id });
-      res.json(mentoringDetails.DetailMentoring);
+      res.json({mentorings: mentoringDetails.DetailMentoring});
     }
     catch(err){
       console.log(err);

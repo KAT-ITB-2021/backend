@@ -13,7 +13,7 @@ router.post('/ekatalog/admin/sponsor/add', addSponsor);
 router.post('/ekatalog/admin/produk/add', addProduk);
 router.delete('/ekatalog/admin/sponsor/remove/:id', removeSponsor);
 router.delete('/ekatalog/admin/produk/remove/:id', removeProduk);
-router.update('/ekatalog/admin/produk/edit/:id', editProduk);
-router.update('/ekatalog/admin/sponsor/edit/:id', editSponsor);
+// router.update('/ekatalog/admin/produk/edit/:id', editProduk);
+// router.update('/ekatalog/admin/sponsor/edit/:id', editSponsor);
 
 module.exports = router;

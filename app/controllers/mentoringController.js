@@ -16,7 +16,7 @@ module.exports = {
       try{
         await prisma.mentoring.create({
           data: {
-            detail,
+            detail: parseInt(detail),
             link,
             kelompok
           },
@@ -46,12 +46,14 @@ module.exports = {
     try{
       const { fields } = await parseForm(req);
       const { detail, link, kelompok } = fields;
+      const numDetail = parseInt(detail);
+
       try {
 
         await prisma.mentoring.update({
           where: { id },
           data: {
-            detail: detail ?? undefined,
+            detail: isNaN(numDetail) ? undefined : numDetail,
             link: link ?? undefined,
             kelompok: kelompok ?? undefined,
           },
@@ -156,7 +158,7 @@ module.exports = {
           },
         },
       });
-      res.json(mentoring);
+      res.json({mentoring});
     }
     catch(err){
       console.log(err);
@@ -180,7 +182,7 @@ module.exports = {
           },
         },
       });
-      res.json(mentoring);
+      res.json({mentoring});
     }
     catch(err){
       console.log(err);

@@ -23,7 +23,7 @@ module.exports = {
               nama: fields.name,
               nim: fields.nim,
               email: fields.email,
-              kelompok: fields.kelompok,
+              kelompok: parseInt(fields.kelompok),
               hashedPassword: derivedKey.toString('hex'),
               salt: salt.toString('hex'),
               role: CURRENT_ROLE,
