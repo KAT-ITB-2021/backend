@@ -58,10 +58,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       [".prisma", [
-        ["link:node_modules/.prisma::locator=backend-kat%40workspace%3A.", {
-          "packageLocation": "./node_modules/.prisma/",
+        ["link:.prisma::locator=backend-kat%40workspace%3A.", {
+          "packageLocation": "./.prisma/",
           "packageDependencies": [
-            [".prisma", "link:node_modules/.prisma::locator=backend-kat%40workspace%3A."]
+            [".prisma", "link:.prisma::locator=backend-kat%40workspace%3A."]
           ],
           "linkType": "SOFT",
           "discardFromLookup": true
@@ -1245,7 +1245,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-e45b412558/node_modules/@prisma/client/",
           "packageDependencies": [
             ["@prisma/client", "virtual:c50d947e50433adb35454807c149c979b8687ae07a3ddd83e44d888788eb2a7cbc83ec4fb44e17e692c996ea1124a5837cf3d510a1fd5df617033ecdffcf73fb#npm:2.28.0"],
-            [".prisma", "link:node_modules/.prisma::locator=backend-kat%40workspace%3A."],
+            [".prisma", "link:.prisma::locator=backend-kat%40workspace%3A."],
             ["@prisma/engines-version", "npm:2.28.0-17.89facabd0366f63911d089156a7a70125bfbcd27"],
             ["@types/prisma", null],
             ["prisma", "npm:2.28.0"]
