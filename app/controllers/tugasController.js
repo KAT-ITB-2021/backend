@@ -105,7 +105,7 @@ module.exports = {
             bagian: fields.bagian ?? undefined,
             judul: fields.judul ?? undefined,
             deskripsi: fields.deskripsi ?? undefined,
-            deadline: fields.deadline ?? undefined
+            deadline: unixSecondsToDate(fields.deadline) ?? undefined
           }
         });
         res.json({message: 'success editing tugas'});
@@ -188,7 +188,10 @@ module.exports = {
             id
           },
           Users: kelompokFilter
-        }
+        },
+        include: {
+          Users: true
+        },
       });
       res.json({submisi});
     }
