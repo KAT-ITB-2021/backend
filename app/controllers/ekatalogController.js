@@ -269,23 +269,19 @@ module.exports = {
       },
     });
 
-    let linkProduks = linkProduk;
+    let linkProduks = JSON.parse(linkProduk);
     // create LinkProduks
     if (linkProduks) {
       if (!Array.isArray(linkProduks)) linkProduks = [linkProduks];
-      await prisma.linkproduk.createMany({
+      await prisma.linkProduk.createMany({
         data: linkProduks.map((link) => {
           return {
-            Produk: {
-              connect: {
-                id: +produk.id,
-              },
-            },
+            produk: produk.id,
             link: link.link,
             jenis: link.jenis,
             linkTo: link.linkTo,
           };
-        }),
+        })
       });
     }
 
@@ -296,22 +292,26 @@ module.exports = {
       await Promise.all(
         file.map((file, i) => {
           new Promise((resolve, reject) => {
-            const pathInBucket = `${nama}_${i}_${file.nama}`;
-            prisma.gambarProduk.create({
-              nama: file.name,
-              path: pathInBucket,
-              Produk: {
-                connect: {
-                  id: +produk.id,
-                },
-              },
-            })
-              .then(() => {
-                resolve();
+            const pathInBucket = `ekatalog/${sponsor}/${i}_${file.name}`;
+            uploadFile(file.path, pathInBucket).then(() => {
+              prisma.gambarProduk.create({
+                data:{
+                  nama: file.name,
+                  path: pathInBucket,
+                  Produk: {
+                    connect: {
+                      id: +produk.id,
+                    },
+                  },
+                }
               })
-              .catch((err) => {
-                reject(err);
-              });
+                .then(() => {
+                  resolve();
+                })
+                .catch((err) => {
+                  reject(err);
+                });
+            });
           });
         })
       );
@@ -347,14 +347,14 @@ module.exports = {
 
       //delete gambar
       let gambarIds = [];
-      if(!Array.isArray(produk.GambarProduk)) produk.GambarProduk = [produk.GambarProduk];
       await Promise.all(
         produk.GambarProduk.map(
-          (gambar) =>
+          (gambar) => {
             new Promise((resolve, reject) => {
               deleteFile(gambar.path).then(resolve).catch(reject);
               gambarIds.push(gambar.id);
-            })
+            });
+          }
         )
       );
       await prisma.GambarProduk.deleteMany({
@@ -450,6 +450,7 @@ module.exports = {
         include: {
           GambarProduk: true,
           LinkProduk: true,
+          Sponsor: true
         },
       });
       res.json({
