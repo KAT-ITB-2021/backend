@@ -226,7 +226,7 @@ module.exports = {
           JadwalPresensis: true
         },
       });
-      res.json(presensi);
+      res.json({presensi});
     }
     catch(err){
       console.log(err);
@@ -254,7 +254,7 @@ module.exports = {
               JadwalPresensis: true
             }
           });
-          res.json(presensi);
+          res.json({presensi});
         }
         catch(err){
           console.log(err);
