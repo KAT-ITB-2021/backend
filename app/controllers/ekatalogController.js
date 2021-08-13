@@ -187,7 +187,7 @@ module.exports = {
 
   async getAllSponsor(_, res) {
     try {
-      const sponsors = await prisma.materi.findMany({
+      const sponsors = await prisma.sponsor.findMany({
         include: {
           Produk: {
             include: {
@@ -242,7 +242,7 @@ module.exports = {
    * images of the product is uploaded in `gambar` field
    */
   async addProduk(req, res) {
-    const { fields, files } = parseForm(req);
+    const { fields, files } = await parseForm(req);
     const {
       nama,
       tipeProduk,
@@ -255,14 +255,16 @@ module.exports = {
 
     // create produk
     const produk = await prisma.produk.create({
-      nama,
-      tipeProduk,
-      deskripsi,
-      hargaAwal,
-      hargaDiskon,
-      Sponsor: {
-        connect: {
-          id: +sponsor,
+      data: {
+        nama,
+        tipeProduk,
+        deskripsi,
+        hargaAwal: +hargaAwal,
+        hargaDiskon: +hargaDiskon,
+        Sponsor: {
+          connect: {
+            id: +sponsor,
+          },
         },
       },
     });
@@ -270,7 +272,7 @@ module.exports = {
     let linkProduks = linkProduk;
     // create LinkProduks
     if (linkProduks) {
-      if (Array.isArray(linkProduks)) linkProduks = [linkProduks];
+      if (!Array.isArray(linkProduks)) linkProduks = [linkProduks];
       await prisma.linkproduk.createMany({
         data: linkProduks.map((link) => {
           return {
@@ -290,12 +292,12 @@ module.exports = {
     // upload gambar
     if (files.file) {
       let file = files.file;
-      if (Array.isArray(files.file)) file = [file];
+      if (!Array.isArray(files.file)) file = [file];
       await Promise.all(
         file.map((file, i) => {
           new Promise((resolve, reject) => {
             const pathInBucket = `${nama}_${i}_${file.nama}`;
-            prisma.GambarProduk.create({
+            prisma.gambarProduk.create({
               nama: file.name,
               path: pathInBucket,
               Produk: {
@@ -345,6 +347,7 @@ module.exports = {
 
       //delete gambar
       let gambarIds = [];
+      if(!Array.isArray(produk.GambarProduk)) produk.GambarProduk = [produk.GambarProduk];
       await Promise.all(
         produk.GambarProduk.map(
           (gambar) =>
@@ -395,13 +398,9 @@ module.exports = {
           nama: fields.nama ?? undefined,
           tipeProduk: fields.tipeProduk ?? undefined,
           deskripsi: fields.deskripsi ?? undefined,
-          hargaAwal: fields.hargaAwal ?? undefined,
-          hargaDiskon: fields.hargaDiskon ?? undefined,
-          Sponsor: {
-            connect: {
-              id: fields.sponsor ?? undefined,
-            },
-          },
+          hargaAwal: +fields.hargaAwal ?? undefined,
+          hargaDiskon: +fields.hargaDiskon ?? undefined,
+          sponsor: +fields.sponsor ?? undefined
         },
       });
 
@@ -423,11 +422,12 @@ module.exports = {
   async getProdukById(req, res) {
     try {
       const id = +req.params.id;
-      const produk = prisma.produk.findUnique({
+      const produk = await prisma.produk.findUnique({
         where: {
           id,
         },
         include: {
+          Sponsor: {select: {nama: true}},
           GambarProduk: true,
           LinkProduk: true,
         },
