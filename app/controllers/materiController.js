@@ -30,7 +30,7 @@ module.exports = {
               data: {
                 name: file.name,
                 path: pathInBucket,
-                materi: {
+                Materi: {
                   connect: {
                     id: materi.id
                   }
