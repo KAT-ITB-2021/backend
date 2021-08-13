@@ -66,8 +66,8 @@ module.exports = {
         await prisma.webinar.update({
           where: { id },
           data: {
-            start: fields.start ?? undefined,
-            end: fields.end ?? undefined,
+            start: unixSecondsToDate(fields.start) ?? undefined,
+            end: unixSecondsToDate(fields.end) ?? undefined,
             ytid: ytid ?? undefined,
             judul: judul ?? undefined,
             deskripsi: deskripsi ?? undefined,
