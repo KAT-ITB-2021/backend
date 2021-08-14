@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../.prisma"
+  previewFeatures = ["referentialActions"]
 }
 
 datasource db {
@@ -67,7 +68,7 @@ model Mentoring {
   detail           Int?
   createdAt        DateTime          @db.DateTime(0) @default(now())
   updatedAt        DateTime          @db.DateTime(0) @updatedAt
-  DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id])
+  DetailMentoring  DetailMentoring? @relation(fields: [detail], references: [id], onDelete: Cascade)
 
   @@index([detail], name: "detail")
   @@map("Mentorings")
@@ -208,4 +209,15 @@ model LinkProduk {
   Produk          Produk?     @relation(fields: [produk], references:[id])
 
   @@index([produk], name: "produk")
+}
+
+model TamuGaleri {
+  id Int @id @default(autoincrement())
+  nama String @db.VarChar(255) @default("")
+  email String @db.VarChar(255) @default("")
+  asal String @db.VarChar(255) @default("")
+  fakultas String? @db.VarChar(255)
+  noKel Int? @db.SmallInt
+  angkatan Int? @db.Int
+  fakjur String? @db.VarChar(255)
 }
