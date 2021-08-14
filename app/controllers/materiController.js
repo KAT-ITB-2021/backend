@@ -1,4 +1,4 @@
-const { Materi, File } = require('../database/models');
+const prisma = require('../helper/prisma');
 const { uploadFile, deleteFile } = require('../helper/uploader');
 const { parseForm } = require('../helper/parseform');
 
@@ -9,14 +9,16 @@ module.exports = {
    * in the form-data, 4 fields are needed: `bagian`, `judul`, `deskripsi`, `embed`
    * embed is a link to youtube video that could be embedded
    * the rest is self explanatory
-   * Files are uploaded in `file` field.
+   * File are uploaded in `file` field.
    */
   async addMateri(req, res){
     try{
       const { fields, files } = await parseForm(req);
       const {bagian, judul, deskripsi, embed} = fields;
-      const materi = await Materi.create({
-        bagian, judul, deskripsi, embed
+      const materi = await prisma.materi.create({
+        data: {
+          bagian, judul, deskripsi, embed
+        }
       });
       if(files.file){
         let file = files.file;
@@ -24,10 +26,16 @@ module.exports = {
         await Promise.all(file.map((file, i) => new Promise((resolve, reject) => {
           const pathInBucket = `${judul}_${i}_${file.name}`;
           uploadFile(file.path, pathInBucket).then(() => {
-            File.create({
-              name: file.name,
-              path: pathInBucket,
-              materi: materi.id
+            prisma.file.create({
+              data: {
+                name: file.name,
+                path: pathInBucket,
+                Materi: {
+                  connect: {
+                    id: materi.id
+                  }
+                }
+              },
             }).then(() => {
               console.log('success');
               resolve();
@@ -50,52 +58,54 @@ module.exports = {
    * Route to remove materi by id
    */
   async removeMateri(req, res){
-    const id = req.params.id;
-    const materi = await Materi.findByPk(id, {
-      include: {
-        model: File
-      }
-    });
-    await Materi.destroy({
-      where: { id }
-    });
-    await Promise.all(materi.File.map((file) => new Promise((resolve, reject) => {
-      deleteFile(file.path).then(resolve).catch(reject);
-    })));
-    res.status(200).json({message: 'success'});
+    const id = +req.params.id;
+    try{
+      const materi = await prisma.materi.delete({
+        where: { id },
+        include: {
+          File: true
+        }
+      });
+      const fileIds = [];
+      await Promise.all(materi.File.map((file) => new Promise((resolve, reject) => {
+        deleteFile(file.path).then(resolve).catch(reject);
+        fileIds.push(file.id);
+      })));
+      await prisma.file.deleteMany({
+        where: {
+          id: { in: fileIds }
+        }
+      });
+      res.status(200).json({message: 'success'});
+    }
+    catch(err){
+      console.log(err);
+      res.status(500).json({message: 'materi delete fail'});
+    }
   },
   /**
    * Route to update materi by id
    * everything is passed by mulitpart/form-data
    * possible fields: `judul`, `deskripsi`, `link`
-   * Files are not possible to delete
+   * File are not possible to delete
    */
   async editMateri(req, res){
     try{
       const {fields} = await parseForm(req);
-      const materi = await Materi.findByPk(req.params.id);
-      if(fields.bagian){
-        materi.bagian = fields.bagian;
-      }
-      if(fields.judul){
-        materi.judul = fields.judul;
-      }
-      if(fields.deskripsi){
-        materi.deskripsi = fields.deskripsi;
-      }
-      if(fields.embed){
-        materi.embed = fields.embed;
-      }
-      try{
-        await materi.save();
-        res.json({message: 'Edit success'});
-      }
-      catch(err){
-        res.status(500).json({message: 'Edit fail'});
-      }
+      await prisma.materi.update({
+        where: { id: +req.params.id },
+        data: {
+          bagian: fields.bagian ?? undefined,
+          judul: fields.judul ?? undefined,
+          deskripsi: fields.deskripsi ?? undefined,
+          embed: fields.embed ?? undefined
+        }
+      });
+      res.json({message: 'Edit success'});
     }
     catch(err){
-      res.status(400);
+      console.log(err);
+      res.status(500).json({message: 'Edit fail'});
     }
   },
   /**
@@ -105,11 +115,9 @@ module.exports = {
    * `id`, `bagian`, and `judul`
    */
   async getAllMateri(_, res){
-    const materis = await Materi.findAll({
-      attributes: ['id', 'bagian', 'judul', 'deskripsi', 'embed'],
+    const materis = await prisma.materi.findMany({
       include: {
-        model: File,
-        attributes: ['name', 'path']
+        File: true
       }
     });
     res.json({materis});
@@ -120,13 +128,12 @@ module.exports = {
    * {`id`, `bagian`, `deskripsi`, `embed`, `files`: [{`name`, `path`}]}
    */
   async getMateriById(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     if(id){
-      const materi = await Materi.findByPk(id, {
-        attributes: { exclude: ['createdAt', 'updatedAt']},
+      const materi = await prisma.materi.findUnique({
+        where: { id },
         include: {
-          model: File,
-          attributes: ['name', 'path']
+          File: true
         }
       });
       if(materi !== null){

@@ -1,6 +1,7 @@
-const { Tugas, SubmisiTugas, User } = require('../database/models');
+const prisma = require('../helper/prisma');
 const { ROLES } = require('../helper/constants');
 const { parseForm } = require('../helper/parseform');
+const { unixSecondsToDate } = require('../helper/parseUnix');
 const { uploadFile, deleteFile } = require('../helper/uploader');
 
 module.exports = {
@@ -12,9 +13,7 @@ module.exports = {
    */
   async getAllTugas(_, res){
     try{
-      const tugas = await Tugas.findAll({
-        attributes: ['id', 'bagian', 'judul']
-      });
+      const tugas = await prisma.tugas.findMany({});
       res.json({tugas});
     }
     catch(err){
@@ -25,16 +24,13 @@ module.exports = {
   /**
    * Route to get specific Tugas of id `id`
    * return object of tugas
-   * {`id`, `bagian`, `judul`, `deskripsi`}
+   * {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}
    */
   async getTugasById(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
-      const tugas = await Tugas.findOne({
+      const tugas = await prisma.tugas.findUnique({
         where: { id },
-        attributes: {
-          exclude: ['createdAt', 'updatedAt']
-        }
       });
       res.json(tugas);
     }
@@ -46,23 +42,29 @@ module.exports = {
   /**
    * Route to add Tugas
    * Everything is passed using multipart/form-data
-   * There are 3 fields that needs to be filled:
-   * `bagian`, `judul`, `deskripsi`.
+   * There are 4 fields that needs to be filled:
+   * `bagian`, `judul`, `deskripsi`, `deadline`.
+   * `deadline` must be formatted as unix epoch (seconds)
    */
   async addTugas(req, res){
     try{
       const { fields } = await parseForm(req);
-      const {bagian, judul, deskripsi} = fields;
-      if(!bagian || !judul || !deskripsi) res.status(401).json({message: 'empty field not allowed'});
-      try{
-        await Tugas.create({
-          bagian, judul, deskripsi
-        });
-        res.json({message: 'success creating tugas'});
-      }
-      catch(err){
-        console.log(err);
-        res.status(500).json({message: 'error when creating tugas'});
+      const {bagian, judul, deskripsi, deadline} = fields;
+      if(!bagian || !judul || !deskripsi || !deadline) res.status(401).json({message: 'empty field not allowed'});
+      else{
+        const deadlineDate = unixSecondsToDate(deadline);
+        try{
+          await prisma.tugas.create({
+            data: {
+              bagian, judul, deskripsi, deadline: deadlineDate
+            }
+          });
+          res.json({message: 'success creating tugas'});
+        }
+        catch(err){
+          console.log(err);
+          res.status(500).json({message: 'error when creating tugas'});
+        }
       }
     }
     catch(err){
@@ -73,9 +75,9 @@ module.exports = {
    * Route to remove Tugas by Id
    */
   async removeTugas(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
-      await Tugas.destroy({
+      await prisma.tugas.delete({
         where: {id}
       });
       res.json({message: 'success removing tugas'});
@@ -88,21 +90,24 @@ module.exports = {
   /**
    * Route to edit tugas by Id
    * just like addTugas, everything is passed using multipart/form-data
-   * and there are 3 fields that could be filled:
-   * `bagian`, `judul`, `deskripsi`. Each field is optional, empty if not needed to update
+   * and there are 4 fields that could be filled:
+   * `bagian`, `judul`, `deskripsi`, `deadline`. Each field is optional, empty if not needed to update
+   * `deadline` must be formatted as unix epoch (seconds)
    */
   async editTugas(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
       const { fields } = await parseForm(req);
       try{
-        const tugas = await Tugas.findOne({
-          where: { id }
+        await prisma.tugas.update({
+          where: { id },
+          data: {
+            bagian: fields.bagian ?? undefined,
+            judul: fields.judul ?? undefined,
+            deskripsi: fields.deskripsi ?? undefined,
+            deadline: unixSecondsToDate(fields.deadline) ?? undefined
+          }
         });
-        if(fields.bagian) tugas.bagian = fields.bagian;
-        if(fields.judul) tugas.judul = fields.judul;
-        if(fields.deskripsi) tugas.deskripsi = fields.deskripsi;
-        await tugas.save();
         res.json({message: 'success editing tugas'});
       }
       catch(err){
@@ -121,17 +126,23 @@ module.exports = {
    * `file` may only have 1 file.
    */
   async submitTugas(req, res){
-    const id = parseInt(req.params.id);
+    const id = +req.params.id;
     try{
       const { files } = await parseForm(req);
       try{
         const bucketPath = `${req.userToken.id}_${id}_${files.file.name}`;
         await uploadFile(files.file.path, bucketPath);
-        await SubmisiTugas.create({
-          nama: files.file.name,
-          path: bucketPath,
-          pemilik: req.userToken.id,
-          tugas: id
+        await prisma.submisiTugas.create({
+          data: {
+            nama: files.file.name,
+            path: bucketPath,
+            Users:{
+              connect: { id: req.userToken.id }
+            },
+            Tugas: {
+              connect: { id }
+            }
+          }
         });
         res.json({message: 'success submitting tugas'});
       }
@@ -148,18 +159,16 @@ module.exports = {
    * Route to remove SubmisiTugas
    */
   async hapusSubmisi(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
-      const submisi = SubmisiTugas.findOne({
-        where: { id, pemilik: req.userToken.id }
-      });
-      await SubmisiTugas.destroy({
-        where: { id, pemilik: req.userToken.id }
+      const submisi = await prisma.submisiTugas.delete({
+        where: { id }
       });
       await deleteFile(submisi.path);
       res.json({message: 'success removing submisi'});
     }
     catch(err){
+      console.log(err);
       res.status(500).json({message: 'error removing submisi'});
     }
   },
@@ -167,26 +176,22 @@ module.exports = {
    * Route to list all SubmisiTugas by Id Tugas
    * returns an object with one property: `submisi`
    * which is an array of SubmisiTugas:
-   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`}}
+   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}}
    */
   async listSubmisiPerTugas(req, res){
-    const id = parseInt(req.params.id);
+    const id = +req.params.id;
     const kelompokFilter = req.userToken.role === ROLES.mentor ? { kelompok: req.userToken.kelompok } : {};
     try{
-      const submisi = await SubmisiTugas.findAll({
-        attributes: ['id', 'nama', 'pemilik', 'path'],
-        include: [{
-          model: Tugas,
-          where: { id },
-          attributes: {
-            exclude: ['createdAt', 'updatedAt']
-          }
+      const submisi = await prisma.submisiTugas.findMany({
+        where: {
+          Tugas: {
+            id
+          },
+          Users: kelompokFilter
         },
-        {
-          model: User,
-          where: kelompokFilter,
-          attributes: ['nim', 'kelompok']
-        }]
+        include: {
+          Users: true
+        },
       });
       res.json({submisi});
     }
@@ -198,25 +203,16 @@ module.exports = {
   /**
    * Route to get own SubmisiTugas on Tugas
    * returns SubmisiTugas:
-   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`}}
+   * {`id`, `nama`, `pemilik`, `path`, `tugas`: {`id`, `bagian`, `judul`, `deskripsi`, `deadline`}}
    */
   async lihatSubmisiSendiri(req, res){
-    const id = req.params.id;
+    const id = +req.params.id;
     try{
-      const submisi = await SubmisiTugas.findOne({
-        attributes: ['id', 'nama', 'pemilik', 'path'],
-        include: [{
-          model: Tugas,
-          where: { id },
-          attributes: {
-            exclude: ['createdAt', 'updatedAt']
-          }
-        },
-        {
-          model: User,
-          where: { id: req.userToken.id },
-          attributes: []
-        }]
+      const submisi = await prisma.submisiTugas.findFirst({
+        where: {
+          Tugas: { id },
+          Users: { id: req.userToken.id }
+        }
       });
       res.json(submisi);
     }
