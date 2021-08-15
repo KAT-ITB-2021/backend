@@ -3,7 +3,7 @@ const prisma = require('../helper/prisma');
 
 module.exports = {
   async addTamu(req, res) {
-    const { fields } = parseForm(req);
+    const { fields } = await parseForm(req);
     const { nama, email, asal, fakultas, noKel, angkatan, fakjur } = fields;
     try{
       await prisma.tamuGaleri.create({
