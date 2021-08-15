@@ -4,7 +4,7 @@ const { ROLES } = require('../helper/constants');
 const { parseForm } = require('../helper/parseform');
 const prisma = require('../helper/prisma');
 
-const CURRENT_ROLE = ROLES.mentor;
+const CURRENT_ROLE = ROLES.peserta;
 
 module.exports = {
   async register(req, res, next) {
