@@ -5,10 +5,6 @@ module.exports = {
   async addTamu(req, res) {
     const { fields } = await parseForm(req);
     const { nama, email, asal, fakultas, noKel, angkatan, fakjur } = fields;
-
-    const noKel = noKelString ? parseInt(noKelString) : undefined;
-    const angkatan = angkatanString ? parseInt(angkatanString) : undefined;
-
     try{
       await prisma.tamuGaleri.create({
         data: {
