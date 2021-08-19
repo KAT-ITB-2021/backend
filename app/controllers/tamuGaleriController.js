@@ -4,7 +4,7 @@ const prisma = require('../helper/prisma');
 module.exports = {
   async addTamu(req, res) {
     const { fields } = await parseForm(req);
-    const { nama, email, asal, fakultas, noKelString, angkatanString, fakjur } = fields;
+    const { nama, email, asal, fakultas, noKel, angkatan, fakjur } = fields;
 
     const noKel = noKelString ? parseInt(noKelString) : undefined;
     const angkatan = angkatanString ? parseInt(angkatanString) : undefined;
@@ -12,7 +12,10 @@ module.exports = {
     try{
       await prisma.tamuGaleri.create({
         data: {
-          nama, email, asal, fakultas, noKel, angkatan, fakjur
+          nama, email, asal, fakultas,
+          noKel: noKel ? parseInt(noKel) : undefined,
+          angkatan: angkatan ? parseInt(angkatan) : undefined,
+          fakjur
         }
       });
       res.json({message: 'success adding data'});
