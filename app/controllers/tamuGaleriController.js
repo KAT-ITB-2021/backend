@@ -8,7 +8,10 @@ module.exports = {
     try{
       await prisma.tamuGaleri.create({
         data: {
-          nama, email, asal, fakultas, noKel, angkatan, fakjur
+          nama, email, asal, fakultas,
+          noKel: noKel ? parseInt(noKel) : undefined,
+          angkatan: angkatan ? parseInt(angkatan) : undefined,
+          fakjur
         }
       });
       res.json({message: 'success adding data'});
