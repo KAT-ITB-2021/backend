@@ -221,3 +221,21 @@ model TamuGaleri {
   angkatan Int? @db.Int
   fakjur String? @db.VarChar(255)
 }
+
+model NilaiQuiz {
+  id              Int         @id @default(autoincrement())
+  user            Int?
+  zona            Int?    
+  nilai           String?     @db.VarChar(255)
+  createdAt       DateTime    @db.DateTime(0) @default(now())
+  updatedAt       DateTime    @db.DateTime(0) @updatedAt
+}
+
+model UnitVisited {
+  id              Int         @id @default(autoincrement())
+  user            Int?
+  zona            Int?
+  namaLembaga     String?     @db.VarChar(255)
+  createdAt       DateTime    @db.DateTime(0) @default(now())
+  updatedAt       DateTime    @db.DateTime(0) @updatedAt 
+}
