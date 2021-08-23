@@ -127,6 +127,9 @@ model User {
   updatedAt       DateTime          @updatedAt
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
+  NilaiQuiz       NilaiQuiz[]
+  UnitVisited     UnitVisited[]
+  
 
   @@index([email])
   @@map("Users")
@@ -229,6 +232,9 @@ model NilaiQuiz {
   nilai           String?     @db.VarChar(255)
   createdAt       DateTime    @db.DateTime(0) @default(now())
   updatedAt       DateTime    @db.DateTime(0) @updatedAt
+  User            User?       @relation(fields: [user], references:[id]) 
+
+  @@index([user], name: "user")
 }
 
 model UnitVisited {
@@ -237,5 +243,8 @@ model UnitVisited {
   zona            Int?
   namaLembaga     String?     @db.VarChar(255)
   createdAt       DateTime    @db.DateTime(0) @default(now())
-  updatedAt       DateTime    @db.DateTime(0) @updatedAt 
+  updatedAt       DateTime    @db.DateTime(0) @updatedAt
+  User            User?       @relation(fields: [user], references:[id]) 
+
+  @@index([user], name: "user")
 }
