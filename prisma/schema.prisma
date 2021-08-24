@@ -128,8 +128,7 @@ model User {
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
   NilaiQuiz       NilaiQuiz[]
-  UnitVisited     UnitVisited[]
-  
+  UnitVisited     LembagaVisited[]
 
   @@index([email])
   @@map("Users")
@@ -226,25 +225,23 @@ model TamuGaleri {
 }
 
 model NilaiQuiz {
-  id              Int         @id @default(autoincrement())
-  user            Int?
-  zona            Int?
-  nilai           String?     @db.VarChar(255)
-  createdAt       DateTime    @db.DateTime(0) @default(now())
-  updatedAt       DateTime    @db.DateTime(0) @updatedAt
-  User            User?       @relation(fields: [user], references:[id])
+  userId          Int
+  zona            Int         @db.UnsignedTinyInt
+  nilai           Int         @db.UnsignedTinyInt
+  user            User?       @relation(fields: [userId], references:[id])
 
-  @@index([user], name: "user")
+  @@id([userId, zona])
+  @@index([userId], name: "userId")
+  @@index([zona], name: "zona")
 }
 
-model UnitVisited {
-  id              Int         @id @default(autoincrement())
-  user            Int?
-  zona            Int?
-  namaLembaga     String?     @db.VarChar(255)
-  createdAt       DateTime    @db.DateTime(0) @default(now())
-  updatedAt       DateTime    @db.DateTime(0) @updatedAt
-  User            User?       @relation(fields: [user], references:[id])
+model LembagaVisited {
+  userId          Int
+  zona            Int         @db.UnsignedTinyInt
+  namaLembaga     String      @db.VarChar(255)
+  User            User?       @relation(fields: [userId], references:[id])
 
-  @@index([user], name: "user")
+  @@id([userId, namaLembaga])
+  @@index([userId], name: "userId")
+  @@index([zona], name: "zona")
 }

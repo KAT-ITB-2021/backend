@@ -19,6 +19,8 @@ module.exports = {
        * }
        */
 
+      // TODO: Fetch JSON
+
       const dataZonaTest = {
         KMK: {
           pertanyaan: [
@@ -44,18 +46,18 @@ module.exports = {
         },
       };
 
-      let unitCount = Object.keys(quizAnswer).length;
-      let total = 0;
-      for (let unit in quizAnswer) {
+      const unitCount = Object.keys(quizAnswer).length;
+      const total = 0;
+      for (const unit in quizAnswer) {
         total = total + evaluateQuiz(quizAnswer[unit], dataZonaTest[unit]);
       }
-      let nilai = Math.round(total / unitCount);
+      const nilai = Math.round(total / unitCount);
 
-      const nilaiQuiz = await prisma.NilaiQuiz.create({
+      const nilaiQuiz = await prisma.nilaiQuiz.create({
         data: {
           zona: zonaId,
           nilai: nilai,
-          User: {
+          user: {
             connect: {
               id: +userId,
             },
@@ -63,11 +65,11 @@ module.exports = {
         },
       });
 
-      res.status(200).json({message:'success', data: {nilai: nilaiQuiz.nilai}})
+      res.status(200).json({ nilai: nilaiQuiz.nilai })
 
     } catch {
       console.log('error');
-      res.status(500).json({ message: "server problem, can't submit quiz" });
+      res.status(500).json({ message: "Masalah pada server, gagal submit jawaban quiz" });
     }
   },
 };
