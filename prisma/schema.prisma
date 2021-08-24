@@ -228,11 +228,11 @@ model TamuGaleri {
 model NilaiQuiz {
   id              Int         @id @default(autoincrement())
   user            Int?
-  zona            Int?    
+  zona            Int?
   nilai           String?     @db.VarChar(255)
   createdAt       DateTime    @db.DateTime(0) @default(now())
   updatedAt       DateTime    @db.DateTime(0) @updatedAt
-  User            User?       @relation(fields: [user], references:[id]) 
+  User            User?       @relation(fields: [user], references:[id])
 
   @@index([user], name: "user")
 }
@@ -244,7 +244,7 @@ model UnitVisited {
   namaLembaga     String?     @db.VarChar(255)
   createdAt       DateTime    @db.DateTime(0) @default(now())
   updatedAt       DateTime    @db.DateTime(0) @updatedAt
-  User            User?       @relation(fields: [user], references:[id]) 
+  User            User?       @relation(fields: [user], references:[id])
 
   @@index([user], name: "user")
 }
