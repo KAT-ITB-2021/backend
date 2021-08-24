@@ -128,7 +128,7 @@ model User {
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
   NilaiQuiz       NilaiQuiz[]
-  UnitVisited     LembagaVisited[]
+  LembagaVisited     LembagaVisited[]
 
   @@index([email])
   @@map("Users")

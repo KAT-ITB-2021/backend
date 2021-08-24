@@ -67,9 +67,54 @@ module.exports = {
 
       res.status(200).json({ nilai: nilaiQuiz.nilai })
 
-    } catch {
-      console.log('error');
+    } catch(e) {
+      console.log(e);
       res.status(500).json({ message: "Masalah pada server, gagal submit jawaban quiz" });
     }
   },
+
+  async visit(req, res) {
+    const { fields } = await parseForm(req);
+    const { namaLembaga } = fields;
+    const userId = +req.params.id;
+    const zona = +req.params.zona;
+
+    try {
+      await prisma.lembagaVisited.create({
+        data: {
+          namaLembaga,
+          zona,
+          User: {
+            connect: {
+              id: userId,
+            }
+          }
+        }
+      })
+
+      res.sendStatus(200);
+    } catch(e) {
+      console.error(e);
+      res.status(500).json({ message: "Masalah pada server, gagal mengupdate status visited" });
+    }
+  },
+
+  async getVisited(req, res) {
+    const userId = +req.params.id;
+
+    try {
+      const hasil = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+        select: {
+          LembagaVisited: true,
+        },
+      });
+
+      res.status(200).json({ visited: hasil.LembagaVisited })
+    } catch (e) {
+      console.error(e);
+    }
+  }
 };
