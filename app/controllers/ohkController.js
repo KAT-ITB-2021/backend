@@ -87,15 +87,14 @@ module.exports = {
 
   async visit(req, res) {
     const { fields } = await parseForm(req);
-    const { namaLembaga } = fields;
+    const { namaLembaga, zona } = fields;
     const userId = +req.params.id;
-    const zona = +req.params.zona;
 
     try {
       await prisma.lembagaVisited.create({
         data: {
           namaLembaga,
-          zona,
+          zona: +zona,
           User: {
             connect: {
               id: userId,
@@ -124,9 +123,9 @@ module.exports = {
         },
       });
 
-      res.status(200).json({ visited: hasil.LembagaVisited })
+      res.status(200).json(hasil.LembagaVisited);
     } catch (e) {
       console.error(e);
     }
-  }
+  },
 };
