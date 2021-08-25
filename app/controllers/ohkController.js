@@ -10,7 +10,7 @@ module.exports = {
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const { userId, zonaId, quizAnswer } = fields;
+      const { userId, zona, quizAnswer } = fields;
       /**
        * Asumsi bentuk quizAnswer
        * {
@@ -56,7 +56,7 @@ module.exports = {
 
       const nilaiQuiz = await prisma.nilaiQuiz.create({
         data: {
-          zona: +zonaId,
+          zona: +zona,
           nilai: nilai,
           user: {
             connect: {
@@ -83,6 +83,39 @@ module.exports = {
     });
 
     res.status(200).json({ nilai: score })
+  },
+
+  async getAllScore(req, res) {
+    // const nilai = await prisma.nilaiQuiz.groupBy({
+    //   by: ['userId'],
+    //   _sum: {
+    //     nilai: true,
+    //   },
+    //   orderBy: {
+    //     _sum: {
+    //       nilai: 'desc',
+    //     },
+    //   },
+    // });
+
+    const nilai = await prisma.$queryRaw`
+      SELECT
+        userId,
+        nama,
+        nim,
+        kelompok,
+        sum(nilai) AS nilai
+      FROM
+        NilaiQuiz JOIN Users
+      WHERE
+        NilaiQuiz.userId = Users.id
+      GROUP BY
+        userId
+      ORDER BY
+        nilai DESC;
+    `;
+
+    res.status(200).json(nilai);
   },
 
   async visit(req, res) {

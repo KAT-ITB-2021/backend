@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../.prisma"
-  previewFeatures = ["referentialActions"]
+  previewFeatures = ["referentialActions", "orderByAggregateGroup"]
 }
 
 datasource db {
