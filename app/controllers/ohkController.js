@@ -67,11 +67,11 @@ module.exports = {
         },
       });
 
-      res.status(201).json({ nilai: nilaiQuiz.nilai })
+      res.status(201).json({ nilai: nilaiQuiz.nilai });
 
     } catch(e) {
       console.log(e);
-      res.status(500).json({ message: "Masalah pada server, gagal submit jawaban quiz" });
+      res.status(500).json({ message: 'Masalah pada server, gagal submit jawaban quiz' });
     }
   },
 
@@ -109,7 +109,7 @@ module.exports = {
       res.status(200).json(nilai);
     } catch (e) {
       console.error(e);
-      res.status(500).json({ message: 'Terjadi kesalahan pada server', })
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
     }
 
   },
@@ -130,12 +130,12 @@ module.exports = {
             }
           }
         }
-      })
+      });
 
       res.sendStatus(201);
     } catch(e) {
       console.error(e);
-      res.status(500).json({ message: "Masalah pada server, gagal mengupdate status visited" });
+      res.status(500).json({ message: 'Masalah pada server, gagal mengupdate status visited' });
     }
   },
 
