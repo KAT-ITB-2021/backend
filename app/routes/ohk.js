@@ -8,3 +8,5 @@ router.post('/ohk/quiz/submit', ohkController.postSubmisiQuiz);
 router.post('/ohk/quiz/get/:id', ohkController.getScore);
 router.post('/ohk/zone/visited/:id', ohkController.getVisited);
 router.post('/ohk/zone/visit/:zona/:id', ohkController.visit);
+
+module.exports = router;

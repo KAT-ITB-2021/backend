@@ -48,15 +48,15 @@ module.exports = {
       };
 
       const unitCount = Object.keys(quizAnswer).length;
-      const total = 0;
+      let total = 0;
       for (const unit in quizAnswer) {
-        total = total + evaluateQuiz(quizAnswer[unit], dataZonaTest[unit].jawabanBenar);
+        total += evaluateQuiz(quizAnswer[unit], dataZonaTest[unit].jawabanBenar);
       }
       const nilai = Math.round(total / unitCount);
 
       const nilaiQuiz = await prisma.nilaiQuiz.create({
         data: {
-          zona: zonaId,
+          zona: +zonaId,
           nilai: nilai,
           user: {
             connect: {
