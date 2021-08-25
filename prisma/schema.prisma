@@ -1,7 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../.prisma"
-  previewFeatures = ["referentialActions"]
+  previewFeatures = ["referentialActions", "orderByAggregateGroup"]
 }
 
 datasource db {
@@ -127,6 +127,8 @@ model User {
   updatedAt       DateTime          @updatedAt
   PresensiPeserta PresensiPeserta[]
   SubmisiTugas    SubmisiTugas[]
+  NilaiQuiz       NilaiQuiz[]
+  LembagaVisited     LembagaVisited[]
 
   @@index([email])
   @@map("Users")
@@ -220,4 +222,26 @@ model TamuGaleri {
   noKel Int? @db.SmallInt
   angkatan Int? @db.Int
   fakjur String? @db.VarChar(255)
+}
+
+model NilaiQuiz {
+  userId          Int
+  zona            Int         @db.UnsignedTinyInt
+  nilai           Int         @db.UnsignedTinyInt
+  user            User?       @relation(fields: [userId], references:[id])
+
+  @@id([userId, zona])
+  @@index([userId], name: "userId")
+  @@index([zona], name: "zona")
+}
+
+model LembagaVisited {
+  userId          Int
+  zona            Int         @db.UnsignedTinyInt
+  namaLembaga     String      @db.VarChar(255)
+  User            User?       @relation(fields: [userId], references:[id])
+
+  @@id([userId, namaLembaga])
+  @@index([userId], name: "userId")
+  @@index([zona], name: "zona")
 }
