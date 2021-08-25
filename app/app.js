@@ -13,6 +13,5 @@ app.use('/', require('./routes/presensi'));
 app.use('/', require('./routes/mentoring'));
 app.use('/', require('./routes/ekatalog'));
 app.use('/', require('./routes/tamuGaleri'));
-app.use('/', require('./routes/ohk'));
 
 module.exports = app;

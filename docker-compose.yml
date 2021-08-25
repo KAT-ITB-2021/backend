@@ -21,8 +21,6 @@ services:
     environment:
       - MARIADB_ROOT_PASSWORD=${DB_PASS}
       - MARIADB_DATABASE=${DB_NAME}
-    ports:
-      - 3306:3306
   database_test:
     container_name: database_test
     image: mariadb:10.6-focal
