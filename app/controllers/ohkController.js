@@ -5,12 +5,13 @@ const { evaluateQuiz } = require('../helper/evaluatequiz');
 module.exports = {
   /**
    * route postSubmisiQuiz, create NilaiQuiz data of a person in a zone
-   * fields required: userId, zonaId, quizAnswer
+   * fields required: zona, quizAnswer
    */
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const { userId, zona, quizAnswer } = fields;
+      const {  zona, quizAnswer } = fields;
+      const { id } = req.userToken;
       /**
        * Asumsi bentuk quizAnswer
        * {
@@ -60,7 +61,7 @@ module.exports = {
           nilai: nilai,
           user: {
             connect: {
-              id: +userId,
+              id: +id,
             },
           },
         },
@@ -121,7 +122,7 @@ module.exports = {
   async visit(req, res) {
     const { fields } = await parseForm(req);
     const { namaLembaga, zona } = fields;
-    const userId = +req.params.id;
+    const { id } = req.userToken;
 
     try {
       await prisma.lembagaVisited.create({
@@ -130,7 +131,7 @@ module.exports = {
           zona: +zona,
           User: {
             connect: {
-              id: userId,
+              id: +id,
             }
           }
         }
@@ -144,12 +145,12 @@ module.exports = {
   },
 
   async getVisited(req, res) {
-    const userId = +req.params.id;
+    const { id } = req.userToken;
 
     try {
       const hasil = await prisma.user.findUnique({
         where: {
-          id: userId,
+          id: +id,
         },
         select: {
           LembagaVisited: true,
