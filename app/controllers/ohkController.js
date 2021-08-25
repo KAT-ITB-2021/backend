@@ -19,7 +19,8 @@ module.exports = {
        * }
        */
 
-      // TODO: Fetch JSON
+      // TODO:
+      // - [ ] Fetch JSON
 
       const dataZonaTest = {
         KMK: {
@@ -49,7 +50,7 @@ module.exports = {
       const unitCount = Object.keys(quizAnswer).length;
       const total = 0;
       for (const unit in quizAnswer) {
-        total = total + evaluateQuiz(quizAnswer[unit], dataZonaTest[unit]);
+        total = total + evaluateQuiz(quizAnswer[unit], dataZonaTest[unit].jawabanBenar);
       }
       const nilai = Math.round(total / unitCount);
 
@@ -65,12 +66,23 @@ module.exports = {
         },
       });
 
-      res.status(200).json({ nilai: nilaiQuiz.nilai })
+      res.status(201).json({ nilai: nilaiQuiz.nilai })
 
     } catch(e) {
       console.log(e);
       res.status(500).json({ message: "Masalah pada server, gagal submit jawaban quiz" });
     }
+  },
+
+  async getScore(req, res) {
+    const userId = +req.params.id;
+
+    const score = await prisma.nilaiQuiz.findMany({
+      where: { userId, },
+      select: { nilai: true, zona: true },
+    });
+
+    res.status(200).json({ nilai: score })
   },
 
   async visit(req, res) {
@@ -92,7 +104,7 @@ module.exports = {
         }
       })
 
-      res.sendStatus(200);
+      res.sendStatus(201);
     } catch(e) {
       console.error(e);
       res.status(500).json({ message: "Masalah pada server, gagal mengupdate status visited" });
