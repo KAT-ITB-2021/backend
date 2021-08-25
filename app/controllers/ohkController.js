@@ -75,17 +75,6 @@ module.exports = {
     }
   },
 
-  async getScore(req, res) {
-    const userId = +req.params.id;
-
-    const score = await prisma.nilaiQuiz.findMany({
-      where: { userId, },
-      select: { nilai: true, zona: true },
-    });
-
-    res.status(200).json({ nilai: score })
-  },
-
   async getAllScore(req, res) {
     // const nilai = await prisma.nilaiQuiz.groupBy({
     //   by: ['userId'],
@@ -99,24 +88,30 @@ module.exports = {
     //   },
     // });
 
-    const nilai = await prisma.$queryRaw`
-      SELECT
-        userId,
-        nama,
-        nim,
-        kelompok,
-        sum(nilai) AS nilai
-      FROM
-        NilaiQuiz JOIN Users
-      WHERE
-        NilaiQuiz.userId = Users.id
-      GROUP BY
-        userId
-      ORDER BY
-        nilai DESC;
-    `;
+    try {
 
-    res.status(200).json(nilai);
+      const nilai = await prisma.$queryRaw`
+        SELECT
+          userId,
+          nama,
+          nim,
+          kelompok,
+          sum(nilai) AS nilai
+        FROM
+          NilaiQuiz JOIN Users
+        WHERE
+          NilaiQuiz.userId = Users.id
+        GROUP BY
+          userId
+        ORDER BY
+          nilai DESC;
+      `;
+      res.status(200).json(nilai);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', })
+    }
+
   },
 
   async visit(req, res) {
@@ -160,6 +155,7 @@ module.exports = {
       res.status(200).json(hasil.LembagaVisited);
     } catch (e) {
       console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server' });
     }
   },
 };
