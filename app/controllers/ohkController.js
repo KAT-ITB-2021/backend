@@ -76,20 +76,7 @@ module.exports = {
   },
 
   async getAllScore(req, res) {
-    // const nilai = await prisma.nilaiQuiz.groupBy({
-    //   by: ['userId'],
-    //   _sum: {
-    //     nilai: true,
-    //   },
-    //   orderBy: {
-    //     _sum: {
-    //       nilai: 'desc',
-    //     },
-    //   },
-    // });
-
     try {
-
       const nilai = await prisma.$queryRaw`
         SELECT
           userId,
@@ -111,7 +98,28 @@ module.exports = {
       console.error(e);
       res.status(500).json({ message: 'Terjadi kesalahan pada server', });
     }
+  },
 
+  async getQuizDone(req, res) {
+    const zona = +req.params.zona;
+    const { id } = req.userToken;
+
+    try {
+      const done = await prisma.nilaiQuiz.findMany({
+        where: {
+          userId: id,
+          zona,
+        },
+        select: {
+          zona: true,
+        },
+      });
+
+      res.status(200).json(done);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
+    }
   },
 
   async visit(req, res) {
