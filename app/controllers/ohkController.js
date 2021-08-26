@@ -77,6 +77,26 @@ module.exports = {
     }
   },
 
+  async getUserScore(req, res) {
+    try {
+      const { id } = req.userToken;
+      const userId = +id;
+      const nilaiRaw = await prisma.nilaiQuiz.findMany({
+        where: { userId, },
+        select: {
+          zona: true,
+          nilai: true,
+        },
+      });
+      const nilaiRes = {};
+      nilaiRaw.forEach(e => nilaiRes[e.zona] = e.nilai);
+      res.status(200).json(nilaiRes);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
+    }
+  },
+
   async getAllScore(req, res) {
     try {
       const nilai = await prisma.$queryRaw`

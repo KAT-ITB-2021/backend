@@ -5,6 +5,7 @@ const ohkController = require('../controllers/ohkController');
 
 router.post('/ohk*', parseToken);
 router.post('/ohk/quiz/submit', ohkController.postSubmisiQuiz);
+router.post('/ohk/quiz/get/score', ohkController.getUserScore);
 router.post('/ohk/quiz/get/score/all', ohkController.getAllScore);
 router.post('/ohk/quiz/get/done', ohkController.getQuizDone);
 router.post('/ohk/zone/visited', ohkController.getVisited);
