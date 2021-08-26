@@ -10,7 +10,8 @@ module.exports = {
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const {  zona, quizAnswer } = fields;
+      const { zona } = fields;
+      let { quizAnswer } = fields;
       const { id } = req.userToken;
       /**
        * Asumsi bentuk quizAnswer
@@ -48,6 +49,7 @@ module.exports = {
         },
       };
 
+      quizAnswer = JSON.parse(quizAnswer);
       const unitCount = Object.keys(quizAnswer).length;
       let total = 0;
       for (const unit in quizAnswer) {
@@ -101,19 +103,19 @@ module.exports = {
   },
 
   async getQuizDone(req, res) {
-    const zona = +req.params.zona;
     const { id } = req.userToken;
 
     try {
-      const done = await prisma.nilaiQuiz.findMany({
+      const doneRaw = await prisma.nilaiQuiz.findMany({
         where: {
           userId: id,
-          zona,
         },
         select: {
           zona: true,
         },
       });
+
+      const done = doneRaw.map(e => e.zona);
 
       res.status(200).json(done);
     } catch (e) {
