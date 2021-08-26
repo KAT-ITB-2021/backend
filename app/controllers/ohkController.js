@@ -10,7 +10,8 @@ module.exports = {
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const {  zona, quizAnswer } = fields;
+      const { zona } = fields;
+      let { quizAnswer } = fields;
       const { id } = req.userToken;
       /**
        * Asumsi bentuk quizAnswer
@@ -48,6 +49,7 @@ module.exports = {
         },
       };
 
+      quizAnswer = JSON.parse(quizAnswer);
       const unitCount = Object.keys(quizAnswer).length;
       let total = 0;
       for (const unit in quizAnswer) {
@@ -76,20 +78,7 @@ module.exports = {
   },
 
   async getAllScore(req, res) {
-    // const nilai = await prisma.nilaiQuiz.groupBy({
-    //   by: ['userId'],
-    //   _sum: {
-    //     nilai: true,
-    //   },
-    //   orderBy: {
-    //     _sum: {
-    //       nilai: 'desc',
-    //     },
-    //   },
-    // });
-
     try {
-
       const nilai = await prisma.$queryRaw`
         SELECT
           userId,
@@ -111,7 +100,28 @@ module.exports = {
       console.error(e);
       res.status(500).json({ message: 'Terjadi kesalahan pada server', });
     }
+  },
 
+  async getQuizDone(req, res) {
+    const { id } = req.userToken;
+
+    try {
+      const doneRaw = await prisma.nilaiQuiz.findMany({
+        where: {
+          userId: id,
+        },
+        select: {
+          zona: true,
+        },
+      });
+
+      const done = doneRaw.map(e => e.zona);
+
+      res.status(200).json(done);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
+    }
   },
 
   async visit(req, res) {
