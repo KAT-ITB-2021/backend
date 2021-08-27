@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const { parseForm } = require('../helper/parseform');
 const prisma = require('../helper/prisma');
 const { evaluateQuiz } = require('../helper/evaluatequiz');
@@ -21,9 +22,10 @@ module.exports = {
        * }
        */
 
+      const cbUrl = 'https://content.katitb2021.com';
+
       const dataZona =
-        await fetch(`https://content.katitb2021.com/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`)
-          .then(e => await e.json());
+        await fetch(`${cbUrl}/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`).then(res => res.json());
 
       quizAnswer = JSON.parse(quizAnswer);
       const unitCount = Object.keys(quizAnswer).length;
