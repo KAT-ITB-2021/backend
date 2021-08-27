@@ -12,7 +12,7 @@ module.exports = {
     try {
       const { fields } = await parseForm(req);
       const { zona } = fields;
-      const { quizAnswer } = fields;
+      let { quizAnswer } = fields;
       const { id } = req.userToken;
       /**
        * bentuk quizAnswer
