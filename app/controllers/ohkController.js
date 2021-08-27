@@ -11,8 +11,8 @@ module.exports = {
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const { zona } = fields;
-      let { quizAnswer } = fields;
+      const zona = +fields.zona;
+      let quizAnswer = fields.quizAnswer;
       const { id } = req.userToken;
       /**
        * bentuk quizAnswer
@@ -23,20 +23,19 @@ module.exports = {
        */
 
       const cbUrl = 'https://content.katitb2021.com';
-
       const dataZona =
         await fetch(`${cbUrl}/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`).then(res => res.json());
-
       quizAnswer = JSON.parse(quizAnswer);
-      let total = 0;
+
+      let nilai = 0;
       for (const unit in quizAnswer) {
-        total += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
+        nilai += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
       }
 
       const nilaiQuiz = await prisma.nilaiQuiz.create({
         data: {
-          zona: +zona,
-          nilai: total,
+          zona:,
+          nilai,
           user: {
             connect: {
               id: +id,
