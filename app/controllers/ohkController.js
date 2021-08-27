@@ -14,46 +14,22 @@ module.exports = {
       let { quizAnswer } = fields;
       const { id } = req.userToken;
       /**
-       * Asumsi bentuk quizAnswer
+       * bentuk quizAnswer
        * {
-       *  KMK: ['a','c','a'],
-       *  UATM: ['b','a','a']
+       *   KMK: ['a','c','a'],
+       *   UATM: ['b','a','a']
        * }
        */
 
-      // TODO:
-      // - [ ] Fetch JSON
-
-      const dataZonaTest = {
-        KMK: {
-          pertanyaan: [
-            'Kapan corona muncul?',
-            'Kapan angkatan 2019 masuk ITB?',
-          ],
-          jawaban: [
-            { a: '2019', b: '2020', c: '2021' },
-            { a: '2018', b: '2019', c: '2020' },
-          ],
-          jawabanBenar: ['b', 'b'],
-        },
-        UATM: {
-          pertanyaan: [
-            'Kapan corona muncul?',
-            'Kapan angkatan 2019 masuk ITB?',
-          ],
-          jawaban: [
-            { a: '2019', b: '2020', c: '2021' },
-            { a: '2018', b: '2019', c: '2020' },
-          ],
-          jawabanBenar: ['b', 'b'],
-        },
-      };
+      const dataZona =
+        await fetch(`https://content.katitb2021.com/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`)
+          .then(e => await e.json());
 
       quizAnswer = JSON.parse(quizAnswer);
       const unitCount = Object.keys(quizAnswer).length;
       let total = 0;
       for (const unit in quizAnswer) {
-        total += evaluateQuiz(quizAnswer[unit], dataZonaTest[unit].jawabanBenar);
+        total += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
       }
       const nilai = Math.round(total / unitCount);
 
