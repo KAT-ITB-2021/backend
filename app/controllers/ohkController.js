@@ -12,7 +12,7 @@ module.exports = {
     try {
       const { fields } = await parseForm(req);
       const { zona } = fields;
-      let { quizAnswer } = fields;
+      const { quizAnswer } = fields;
       const { id } = req.userToken;
       /**
        * bentuk quizAnswer
@@ -28,17 +28,15 @@ module.exports = {
         await fetch(`${cbUrl}/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`).then(res => res.json());
 
       quizAnswer = JSON.parse(quizAnswer);
-      const unitCount = Object.keys(quizAnswer).length;
       let total = 0;
       for (const unit in quizAnswer) {
         total += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
       }
-      const nilai = Math.round(total / unitCount);
 
       const nilaiQuiz = await prisma.nilaiQuiz.create({
         data: {
           zona: +zona,
-          nilai: nilai,
+          nilai: total,
           user: {
             connect: {
               id: +id,
