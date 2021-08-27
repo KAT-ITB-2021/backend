@@ -32,20 +32,23 @@ module.exports = {
         nilai += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
       }
 
-      const nilaiQuiz = await prisma.nilaiQuiz.create({
-        data: {
-          zona:,
-          nilai,
-          user: {
-            connect: {
-              id: +id,
+      if (zona !== 7 || (zona === 7 && nilai === 4)) {
+        const nilaiQuiz = await prisma.nilaiQuiz.create({
+          data: {
+            zona,
+            nilai,
+            user: {
+              connect: {
+                id: +id,
+              },
             },
           },
-        },
-      });
+        });
 
-      res.status(201).json({ nilai: nilaiQuiz.nilai });
-
+        res.status(201).json({ nilai: nilaiQuiz.nilai });
+      } else {
+        res.status(200).json({ nilai: 0 });
+      }
     } catch(e) {
       console.log(e);
       res.status(500).json({ message: 'Masalah pada server, gagal submit jawaban quiz' });
