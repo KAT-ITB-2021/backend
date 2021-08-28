@@ -9,7 +9,7 @@
     "pretest": "NODE_ENV=test yarn sequelize db:migrate",
     "test": "yarn pretest && yarn jest && yarn posttest",
     "posttest": "NODE_ENV=test yarn sequelize db:migrate:undo:all",
-    "lint": "yarn eslint --ext \".js\" --ignore-path .gitignore --ignore-path .eslintignore .",
+    "lint": "yarn eslint --ext \".js\" --ignore-path .gitignore --ignore-path .eslintignore ./app",
     "watch": "yarn nodemon",
     "start": "node app/index.js",
     "dev": "yarn nodemon"
@@ -24,6 +24,7 @@
     "formidable": "^1.2.2",
     "jsonwebtoken": "^8.5.1",
     "mariadb": "^2.5.3",
+    "node-fetch": "^2.6.1",
     "sequelize": "^6.6.2",
     "sequelize-cli": "^6.2.0"
   },

@@ -8,22 +8,22 @@ jobs:
       - uses: actions/setup-node@v2
       - run: yarn install
       - run: yarn lint
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-      - run: yarn install
-      - run: yarn test
-        env:
-          DB_TEST_PORT: ${{ job.services.database.ports['3306'] }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-    services:
-      database:
-        image: mariadb:10.6-focal
-        env:
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
-          MARIADB_DATABASE: test
-        ports:
-        - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-node@v2
+  #     - run: yarn install
+  #     - run: yarn test
+  #       env:
+  #         DB_TEST_PORT: ${{ job.services.database.ports['3306'] }}
+  #         JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  #   services:
+  #     database:
+  #       image: mariadb:10.6-focal
+  #       env:
+  #         MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+  #         MARIADB_DATABASE: test
+  #       ports:
+  #       - 3306:3306
+  #       options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3

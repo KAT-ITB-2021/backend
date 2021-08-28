@@ -1,3 +1,4 @@
+const fetch = require('node-fetch');
 const { parseForm } = require('../helper/parseform');
 const prisma = require('../helper/prisma');
 const { evaluateQuiz } = require('../helper/evaluatequiz');
@@ -10,86 +11,72 @@ module.exports = {
   async postSubmisiQuiz(req, res) {
     try {
       const { fields } = await parseForm(req);
-      const {  zona, quizAnswer } = fields;
+      const zona = +fields.zona;
+      let quizAnswer = fields.quizAnswer;
       const { id } = req.userToken;
       /**
-       * Asumsi bentuk quizAnswer
+       * bentuk quizAnswer
        * {
-       *  KMK: ['a','c','a'],
-       *  UATM: ['b','a','a']
+       *   KMK: ['a','c','a'],
+       *   UATM: ['b','a','a']
        * }
        */
 
-      // TODO:
-      // - [ ] Fetch JSON
+      const cbUrl = 'https://content.katitb2021.com';
+      const dataZona =
+        await fetch(`${cbUrl}/json/OHK/Kuis/Minigames%20Zona%20${zona}.json`).then(res => res.json());
+      quizAnswer = JSON.parse(quizAnswer);
 
-      const dataZonaTest = {
-        KMK: {
-          pertanyaan: [
-            'Kapan corona muncul?',
-            'Kapan angkatan 2019 masuk ITB?',
-          ],
-          jawaban: [
-            { a: '2019', b: '2020', c: '2021' },
-            { a: '2018', b: '2019', c: '2020' },
-          ],
-          jawabanBenar: ['b', 'b'],
-        },
-        UATM: {
-          pertanyaan: [
-            'Kapan corona muncul?',
-            'Kapan angkatan 2019 masuk ITB?',
-          ],
-          jawaban: [
-            { a: '2019', b: '2020', c: '2021' },
-            { a: '2018', b: '2019', c: '2020' },
-          ],
-          jawabanBenar: ['b', 'b'],
-        },
-      };
-
-      const unitCount = Object.keys(quizAnswer).length;
-      let total = 0;
+      let nilai = 0;
       for (const unit in quizAnswer) {
-        total += evaluateQuiz(quizAnswer[unit], dataZonaTest[unit].jawabanBenar);
+        nilai += evaluateQuiz(quizAnswer[unit], dataZona[unit].jawabanBenar);
       }
-      const nilai = Math.round(total / unitCount);
 
-      const nilaiQuiz = await prisma.nilaiQuiz.create({
-        data: {
-          zona: +zona,
-          nilai: nilai,
-          user: {
-            connect: {
-              id: +id,
+      if (zona !== 7 || (zona === 7 && nilai === 4)) {
+        const nilaiQuiz = await prisma.nilaiQuiz.create({
+          data: {
+            zona,
+            nilai,
+            user: {
+              connect: {
+                id: +id,
+              },
             },
           },
-        },
-      });
+        });
 
-      res.status(201).json({ nilai: nilaiQuiz.nilai });
-
+        res.status(201).json({ nilai: nilaiQuiz.nilai });
+      } else {
+        res.status(200).json({ nilai: 0 });
+      }
     } catch(e) {
       console.log(e);
       res.status(500).json({ message: 'Masalah pada server, gagal submit jawaban quiz' });
     }
   },
 
-  async getAllScore(req, res) {
-    // const nilai = await prisma.nilaiQuiz.groupBy({
-    //   by: ['userId'],
-    //   _sum: {
-    //     nilai: true,
-    //   },
-    //   orderBy: {
-    //     _sum: {
-    //       nilai: 'desc',
-    //     },
-    //   },
-    // });
-
+  async getUserScore(req, res) {
     try {
+      const { id } = req.userToken;
+      const userId = +id;
+      const nilaiRaw = await prisma.nilaiQuiz.findMany({
+        where: { userId, },
+        select: {
+          zona: true,
+          nilai: true,
+        },
+      });
+      const nilaiRes = {};
+      nilaiRaw.forEach(e => nilaiRes[e.zona] = e.nilai);
+      res.status(200).json(nilaiRes);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
+    }
+  },
 
+  async getAllScore(req, res) {
+    try {
       const nilai = await prisma.$queryRaw`
         SELECT
           userId,
@@ -111,7 +98,28 @@ module.exports = {
       console.error(e);
       res.status(500).json({ message: 'Terjadi kesalahan pada server', });
     }
+  },
 
+  async getQuizDone(req, res) {
+    const { id } = req.userToken;
+
+    try {
+      const doneRaw = await prisma.nilaiQuiz.findMany({
+        where: {
+          userId: id,
+        },
+        select: {
+          zona: true,
+        },
+      });
+
+      const done = doneRaw.map(e => e.zona);
+
+      res.status(200).json(done);
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ message: 'Terjadi kesalahan pada server', });
+    }
   },
 
   async visit(req, res) {
